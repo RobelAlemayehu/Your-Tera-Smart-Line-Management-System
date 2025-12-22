@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "database_development",
+    "username": "slms_user",
+    "password": "YourTera2025$",
+    "database": "Your_Tera",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "logging": false

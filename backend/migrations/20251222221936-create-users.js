@@ -9,6 +9,31 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
+    await queryInterface.createTable('Users', {
+      user_id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      
+      phone_number: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      role: {
+        type: Sequelize.ENUM('Customer', 'Admin'),
+        allowNull: false,
+        defaultValue: 'Customer'
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      }
+    });
+
   },
 
   async down (queryInterface, Sequelize) {
@@ -18,5 +43,7 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    await queryInterface.dropTable('Users');
+
   }
 };
