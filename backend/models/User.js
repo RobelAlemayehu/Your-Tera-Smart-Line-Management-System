@@ -32,5 +32,13 @@ module.exports = (sequelize, DataTypes) => {
             underscored:true
         }
     );
+
+    User.associate = function(models) {
+        User.hasOne(models.Accounts, {
+            foreignKey: 'user_id',
+            as: 'Account'
+        });
+    };
+
     return User;
 }

@@ -3,9 +3,10 @@
 require('dotenv').config();
 
 const { where } = require('sequelize');
-const { User, Account, Session, sequelize } = require('../models');
-const bcrypt = require('bcrypt')
-const JWT_SECRETE = process.env.JWT_SECRETE;
+const { User, Accounts, Session, sequelize } = require('../models');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || process.env.JWT_SECRETE;
 
 module.exports = {
     // Register: Create User and Account together
@@ -16,7 +17,7 @@ module.exports = {
 
 
             // check if the acc is already exist
-            const existingAccount = await Account.findOne({ where: { email } });
+            const existingAccount = await Accounts.findOne({ where: { email } });
             if (existingAccount) {
                 return res.status(400).json({ message: "Email already in use" }); 
             }
@@ -34,7 +35,7 @@ module.exports = {
 
 
             //create acc linked to user
-            await Account.create({
+            await Accounts.create({
                 user_id: newUser.user_id,
                 email,
                 password_hash: hashedPassword
@@ -57,24 +58,28 @@ module.exports = {
             const { email, password } = req.body;
 
 
-            const account = await Account.findOne({
+            const account = await Accounts.findOne({
                 where: { email },
                 include: [{ model: User, as: 'User'}]
             });
 
-            if(!Account) {
+            if(!account) {
                 return res.status(404).json({ message: "User not found" });
+            }
+
+            if(!account.User) {
+                return res.status(500).json({ message: "User association not found" });
             }
 
             const isMatch = await bcrypt.compare(password, account.password_hash);
             if(!isMatch){
-                return res.status(404).json({ message: "Invalid credentials" });
+                return res.status(401).json({ message: "Invalid credentials" });
             }
 
 
-            const token =  jwt.sign(
+            const token = jwt.sign(
                 { user_id: account.user_id, role: account.User.role },
-                JWT_SECRETE, 
+                JWT_SECRET, 
                 { expiresIn: '24h'}
             );
 
