@@ -5,6 +5,11 @@ require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.JWT_SECRETE;
 
+// Validate JWT_SECRET is set
+if (!JWT_SECRET) {
+    console.error('ERROR: JWT_SECRET environment variable is not set!');
+}
+
 
 module.exports = (req, res, next) => {
 
@@ -15,6 +20,12 @@ module.exports = (req, res, next) => {
     }
 
 
+
+    if (!JWT_SECRET) {
+        return res.status(500).json({ 
+            message: "JWT_SECRET is not configured." 
+        });
+    }
 
     try{
 

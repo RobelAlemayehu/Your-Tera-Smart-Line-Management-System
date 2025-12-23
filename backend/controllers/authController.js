@@ -8,6 +8,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || process.env.JWT_SECRETE;
 
+
+if (!JWT_SECRET) {
+    console.error('ERROR: JWT_SECRET environment variable is not set!');
+}
+
 module.exports = {
     // Register: Create User and Account together
     register: async (req, res) => {
@@ -76,6 +81,12 @@ module.exports = {
                 return res.status(401).json({ message: "Invalid credentials" });
             }
 
+            // Check if JWT_SECRET is configured
+            if (!JWT_SECRET) {
+                return res.status(500).json({ 
+                    error: "JWT_SECRET is not configured." 
+                });
+            }
 
             const token = jwt.sign(
                 { user_id: account.user_id, role: account.User.role },
