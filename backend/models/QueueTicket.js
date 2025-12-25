@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
             },
 
             ticket_number: {
-                type:DataTypes.INTEGER,
+                type:DataTypes.STRING,
                 allowNull:false
             },
 
@@ -62,6 +62,10 @@ module.exports = (sequelize, DataTypes) => {
 
     );
 
+    QueueTicket.associate = function(models) {
+        QueueTicket.belongsTo(models.User, { foreignKey: 'user_id', as:'user' });
+        QueueTicket.belongsTo(models.Service, { foreignKey: 'service_id', as: 'service'});
+    };
 
-    return QueueTicket
+    return QueueTicket;
 }

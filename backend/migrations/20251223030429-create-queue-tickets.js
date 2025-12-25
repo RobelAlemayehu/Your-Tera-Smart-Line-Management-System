@@ -34,7 +34,7 @@ module.exports = {
       },
 
       ticket_number: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
 
