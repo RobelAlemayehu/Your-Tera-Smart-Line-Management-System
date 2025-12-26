@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 
 // Public
 import Landing from "../pages/public/Landing";
+import About from "../pages/public/About";
+import TestAbout from "../pages/public/TestAbout";
 import Services from "../pages/public/Services";
 import ServiceDetail from "../pages/public/ServiceDetail";
 
@@ -21,6 +23,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/test" element={<TestAbout />} />
       <Route path="/services" element={<Services />} />
       <Route path="/services/:id" element={<ServiceDetail />} />
 
