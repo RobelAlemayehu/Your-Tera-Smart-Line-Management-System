@@ -53,40 +53,54 @@ module.exports = {
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
-            const account = await Accounts.findOne({
-                where: { email },
-                include: [{ model: User, as: 'User' }]
-            });
+        
+        // 1. Find the account and include the associated User info
+        const account = await Accounts.findOne({
+            where: { email },
+            include: [{ model: User, as: 'User' }]
+        });
 
-            if (!account || !account.User) {
-                return res.status(404).json({ message: "User not found" });
+        if (!account || !account.User) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // 2. Compare passwords
+        const isMatch = await bcrypt.compare(password, account.password_hash);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        /**
+         * 3. Create the token
+         * CRITICAL FIX: Use 'id' so it matches what your middleware 
+         * and 'getMyStatus' controller are looking for.
+         */
+        const token = jwt.sign(
+            { id: account.user_id, role: account.User.role }, 
+            process.env.JWT_SECRET || JWT_SECRET, 
+            { expiresIn: '24h' }
+        );
+
+        // 4. Handle Session creation
+        const expiryDate = new Date();
+        expiryDate.setHours(expiryDate.getHours() + 24);
+
+        await Session.create({
+            session_token: token,
+            user_id: account.user_id,
+            expiry: expiryDate
+        });
+
+        // 5. Send success response
+        res.status(200).json({
+            message: "Login Successfully!",
+            token,
+            user: { 
+                id: account.user_id, 
+                role: account.User.role 
             }
+        });
 
-            const isMatch = await bcrypt.compare(password, account.password_hash);
-            if (!isMatch) {
-                return res.status(401).json({ message: "Invalid credentials" });
-            }
-
-            const token = jwt.sign(
-                { user_id: account.user_id, role: account.User.role },
-                JWT_SECRET, 
-                { expiresIn: '24h' }
-            );
-
-            const expiryDate = new Date();
-            expiryDate.setHours(expiryDate.getHours() + 24);
-
-            await Session.create({
-                session_token: token,
-                user_id: account.user_id,
-                expiry: expiryDate
-            });
-
-            res.status(200).json({
-                message: "Login Successfully!",
-                token,
-                user: { id: account.user_id, role: account.User.role }
-            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

@@ -31,13 +31,44 @@ exports.getOfficeQueue = async (req, res) => {
     }
 };
 
-exports.updateTicketStatus = async (req, res) => {
+/**
+ * Get the logged-in user's active ticket
+ */
+exports.getMyStatus = async (req, res) => {
+    try {
+        const userId = req.user.id; 
+        const tickets = await queueService.getMyActiveTickets(userId);
+
+        if (!tickets || tickets.length === 0) {
+            return res.status(200).json({ message: "No active tickets found." });
+        }
+
+        // Map through all tickets to get specific positions
+        const results = await Promise.all(tickets.map(async (t) => {
+            const pos = await queueService.getQueuePosition(t.service_id, t.ticket_number);
+            return {
+                ticket_id: t.ticket_id,
+                service_name: t.service.service_name,
+                ticket_number: t.ticket_number,
+                status: t.status,
+                ...pos
+            };
+        }));
+
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+/**
+ * Allow a user to cancel their own ticket
+ */
+exports.cancelMyTicket = async (req, res) => {
     try {
         const { ticketId } = req.params;
-        const { status } = req.body;
-        const ticket = await queueService.updateStatus(ticketId, status);
-        res.status(200).json({ message: `Ticket status updated to ${status}`, ticket });
+        const result = await queueService.cancelTicket(ticketId, req.user.id);
+        res.json(result);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };

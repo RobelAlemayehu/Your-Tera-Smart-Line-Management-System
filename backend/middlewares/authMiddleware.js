@@ -1,59 +1,59 @@
 'use strict';
+
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-
+/**
+ * Fallback to different spelling of 'SECRET' to prevent crashes,
+ * but ensure your .env file uses JWT_SECRET.
+ */
 const JWT_SECRET = process.env.JWT_SECRET || process.env.JWT_SECRETE;
 
-// Validate JWT_SECRET is set
+// Check if secret exists on startup
 if (!JWT_SECRET) {
-    console.error('ERROR: JWT_SECRET environment variable is not set!');
+    console.warn('WARNING: JWT_SECRET environment variable is not defined!');
 }
 
-
-module.exports = (req, res, next) => {
-
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if(!token){
-        return res.status(401).json({ message: "No token, authorization denied" });
-    }
-
-
-
-    if (!JWT_SECRET) {
-        return res.status(500).json({ 
-            message: "JWT_SECRET is not configured." 
-        });
-    }
-
-    try{
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-
-        req.user = decoded;
-
-        next();
-
-    }catch (err){
-        res.status(401).json({ message: "Token is invalid" });
-    }
-};
-
+/**
+ * Main Authentication Middleware
+ * This will extract the 'id' and 'role' from the token and attach it to req.user
+ */
 const verifyToken = (req, res, next) => {
+    // 1. Get token from the Authorization header
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    
+    // Support both "Bearer <token>" and just "<token>"
+    const token = authHeader && (authHeader.startsWith('Bearer ') 
+        ? authHeader.split(' ')[1] 
+        : authHeader);
 
     if (!token) {
         return res.status(401).json({ message: "Access Denied: No Token Provided" });
     }
 
+    // 2. Ensure server is configured
+    if (!JWT_SECRET) {
+        return res.status(500).json({ message: "Server Configuration Error: JWT_SECRET missing" });
+    }
+
     try {
+        // 3. Verify and Decode
         const verified = jwt.verify(token, JWT_SECRET);
+        
+        /**
+         * Based on your login function, this 'verified' object 
+         * now contains { id, role }.
+         */
         req.user = verified;
-        next();
+        
+        next(); // Proceed to the controller
     } catch (error) {
-        res.status(403).json({ message: "Invalid or Expired Token" });
+        // Handle expired vs just plain invalid tokens
+        const message = error.name === 'TokenExpiredError' 
+            ? "Token has expired" 
+            : "Invalid Token";
+            
+        res.status(403).json({ message });
     }
 };
 
