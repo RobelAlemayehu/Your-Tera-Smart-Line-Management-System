@@ -31,11 +31,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER, // Changed from STRING to INTEGER to match your auto-increment logic
             allowNull: false
         },
-        issued_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
-        },
+        // issued_at: {
+        //     type: DataTypes.DATE,
+        //     allowNull: false,
+        //     defaultValue: DataTypes.NOW
+        // },
         status: {
             type: DataTypes.ENUM('Waiting', 'Serving', 'Completed', 'Cancelled'),
             allowNull: false,
@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         tableName: 'Queue_Tickets',
-        timestamps: false, // Since you are using 'issued_at' manually
+        timestamps: true, 
         underscored: true 
     });
 

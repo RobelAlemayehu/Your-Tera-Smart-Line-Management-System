@@ -1,47 +1,31 @@
-const { QueueTicket, Service, Sequelize } = require('../models');
-const { Op } = Sequelize;
+'use strict';
+const { QueueTicket, User, Service } = require('../models');
 
-exports.joinQueue = async (user_id, service_id) => {
-    // Check if the model is loaded to prevent the 'undefined' error
-    if (!QueueTicket) {
-        throw new Error("QueueTicket model not found in models/index.js");
-    }
-
-    const lastTicket = await QueueTicket.max('ticket_number', { 
-        where: { service_id: service_id } 
-    });
-
-    return await QueueTicket.create({
-        user_id,
-        service_id,
-        ticket_number: (lastTicket || 0) + 1,
-        status: 'Waiting'
-    });
-};
-
-exports.getActualWaitTime = async (ticketId) => {
-    const ticket = await QueueTicket.findByPk(ticketId);
-    if (!ticket) return 0;
-    
-    const diffInMs = new Date() - new Date(ticket.issued_at); // Use issued_at
-    return Math.floor(diffInMs / 60000);
-};
-
-exports.getEstimatedWait = async (ticketId) => {
-    const ticket = await QueueTicket.findByPk(ticketId, {
-        include: [{ model: Service }]
-    });
-    
-    if (!ticket) throw new Error("Ticket not found");
-
-    const peopleAhead = await QueueTicket.count({
-        where: { 
-            service_id: ticket.service_id, 
-            status: 'Waiting',
-            ticket_number: { [Op.lt]: ticket.ticket_number } 
+module.exports = {
+    joinQueue: async (user_id, service_id) => {
+        // 1. Check if User exists first
+        const user = await User.findByPk(user_id);
+        if (!user) {
+            throw new Error(`User with ID ${user_id} does not exist. Create the user first!`);
         }
-    });
 
-    const waitFactor = ticket.Service?.avg_wait_time || 15;
-    return peopleAhead * waitFactor;
+        // 2. Check if Service exists
+        const service = await Service.findByPk(service_id);
+        if (!service) {
+            throw new Error(`Service with ID ${service_id} does not exist.`);
+        }
+
+        // 3. Get the next ticket number
+        const lastTicket = await QueueTicket.max('ticket_number', { 
+            where: { service_id } 
+        });
+
+        // 4. Create the ticket
+        return await QueueTicket.create({
+            user_id,
+            service_id,
+            ticket_number: (lastTicket || 0) + 1,
+            status: 'Waiting'
+        });
+    }
 };
