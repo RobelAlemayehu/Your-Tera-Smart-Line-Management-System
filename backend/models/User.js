@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
             },
             password: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
+                get() {
+                     return "********"; // This hides the real value when reading data
+                }
             },
             phone_number: {
                 type: DataTypes.STRING,
@@ -35,7 +38,16 @@ module.exports = (sequelize, DataTypes) => {
         {
             tableName: 'Users',
             timestamps: false,
-            underscored: true
+            underscored: true,
+            
+            defaultScope: {
+                attributes: { exclude: ['password'] }
+            },
+            scopes: {
+                withPassword: {
+                    attributes: { include: ['password'] }
+                }
+            }
         }
     );
 

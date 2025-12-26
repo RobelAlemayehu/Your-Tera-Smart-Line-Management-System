@@ -10,7 +10,11 @@ module.exports = {
     register: async (req, res) => {
         const t = await sequelize.transaction();
         try {
-            const { phone_number, email, password, role } = req.body; 
+            const { phone_number, email, username, password, role } = req.body; 
+            
+            if (!password) {
+                return res.status(400).json({ message: "Password is required" });
+            }
 
             const existingAccount = await Accounts.findOne({ where: { email } });
             if (existingAccount) {
@@ -22,6 +26,7 @@ module.exports = {
             const newUser = await User.create({
                 phone_number,
                 email,
+                username,
                 password, // Mandatory field in User.js
                 role: role || 'Customer',
             }, { transaction: t });
