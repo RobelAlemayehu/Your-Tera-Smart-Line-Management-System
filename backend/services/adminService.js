@@ -1,9 +1,5 @@
-const { QueueTicket, sequelize } = require('../models'); 
+const { QueueTicket, Service, User, sequelize } = require('../models');
 
-/**
- * Expected Functionality: Aggregate data for admin dashboards.
- * Similar to how sessionService might count active users.
- */
 const getQueueAnalytics = async () => {
     try {
         return await QueueTicket.findAll({
@@ -12,7 +8,6 @@ const getQueueAnalytics = async () => {
                 [sequelize.fn('COUNT', sequelize.col('ticket_id')), 'count']
             ],
             group: ['status'],
-            // Ensures we get raw data back for the controller to format
             raw: true 
         });
     } catch (error) {
@@ -20,10 +15,6 @@ const getQueueAnalytics = async () => {
     }
 };
 
-/**
- * Expected Functionality: Maintenance task to clear out old tickets.
- * This is a "destructive" action, so it requires a specific service method.
- */
 const resetQueueForDay = async (service_id) => {
     if (!service_id) {
         throw new Error('Service ID is required to reset the queue.');
@@ -62,5 +53,60 @@ const deleteSpecificTicket = async (service_id, ticket_id) => {
     }
 };
 
-// Add it to your exports
-module.exports = { getQueueAnalytics, resetQueueForDay, deleteSpecificTicket };
+const createNewService = async (serviceData) => {
+    try {
+        // serviceData should contain { service_name, description, etc. }
+        const newService = await Service.create(serviceData);
+        return {
+            message: "New service added successfully",
+            service: newService
+        };
+    } catch (error) {
+        // Handle validation errors (e.g., if the service name already exists)
+        throw new Error('Failed to create service: ' + error.message);
+    }
+};
+
+// USER MANAGEMENT
+const getAllUsers = async () => {
+    return await User.findAll({ attributes: { exclude: ['password'] } });
+};
+
+const updateUserRole = async (user_id, role) => {
+    const user = await User.findByPk(user_id);
+    if (!user) throw new Error('User not found');
+    user.role = role;
+    await user.save();
+    return user;
+};
+
+// SERVICE TOGGLE (Soft Delete)
+const toggleServiceStatus = async (service_id, is_active) => {
+    const service = await Service.findByPk(service_id);
+    if (!service) throw new Error('Service not found');
+    service.is_active = is_active;
+    await service.save();
+    return service;
+};
+
+// TICKET STATUS CONTROL
+const updateTicketStatus = async (ticket_id, status) => {
+    const ticket = await QueueTicket.findByPk(ticket_id);
+    if (!ticket) throw new Error('Ticket not found');
+    ticket.status = status; // e.g., 'In Progress', 'Completed', 'Cancelled'
+    await ticket.save();
+    return ticket;
+};
+
+
+module.exports = { 
+    getQueueAnalytics, 
+    resetQueueForDay, 
+    deleteSpecificTicket, 
+    createNewService,
+    getAllUsers, 
+    updateUserRole, 
+    toggleServiceStatus, 
+    updateTicketStatus, 
+    getQueueAnalytics  
+};
