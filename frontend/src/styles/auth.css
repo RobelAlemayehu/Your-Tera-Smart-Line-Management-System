@@ -1,0 +1,287 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background: linear-gradient(180deg, rgba(62, 129, 139, 1), rgba(5, 63, 71, 1));
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    Gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    
+}
+
+
+
+/*SIGN IN & SIGN UP PAGE STYLES*/
+
+.card{
+    background-color: rgba(156, 168, 178, 1);
+    border-radius: 25.78px;
+    border: 1.29px solid rgba(48, 78, 97, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 30px ;
+    width: 100%;  
+    max-width: 1000px; 
+    min-width: 300px; 
+     /* Center the card */
+    margin: 0 auto;
+
+}
+
+h1{
+    font-family: 'Crimson Pro', serif;
+    font-size:  clamp(36px, 8vw, 72px); /* Responsive font size */
+    font-weight: 400;
+    line-height: 100%;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 30px;
+    
+}
+
+.row{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+/* Make row responsive */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column; /* Stack on mobile */
+        gap: 15px;
+    }
+}
+.field{
+    flex: 1; /* Make fields take equal space */
+    width: 100%;
+    min-width: 0; /* Prevent overflow */
+    margin-bottom: 12px;
+
+}
+.field label{
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(18px, 4vw, 24px); /* Responsive */
+    font-weight: 400;
+    margin-bottom: 5px;
+    display: block;
+    white-space: nowrap;/*keeps text on one single line*/
+}
+
+input{
+    width: 100%;
+    padding: 10px;
+    margin-top: 4px;
+    border: 1px solid black;
+    border-radius: 4px; 
+    font-size: 16px;
+    font-family: 'Crimson Pro', serif;
+}
+#p1{  /*for signup*/
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: black;
+    margin-top: -8px;
+    margin-bottom: 12px;
+}
+
+#p2{   /*for Signin page*/
+    font-family: 'Crimson Pro', serif;
+    font-size: 24px;
+    font-weight: 400;   
+    margin-top: -8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+#p2 a {
+    text-decoration: none;
+    color: rgba(0, 87, 146, 1);
+}
+#p2 a:hover{
+    color:  rgb(58, 151, 212);
+}
+.terms{
+    font-family: 'Crimson Pro', serif;
+    font-size:  clamp(16px, 3vw, 20px); /* Responsive */
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.terms a{
+    color: black;
+    text-decoration: none;
+}
+.terms a:hover {
+    color: blue;
+}
+
+.btn-btn{
+    width: 100%;
+    height: 60px;
+    background-color: rgba(36, 47, 54, 1);
+    border-radius: 8px;
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(24px, 6vw, 48px);
+    font-style: italic;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 5px;
+}
+.btn-btn:hover {
+    background-color: rgba(48, 62, 71, 1);
+}
+
+.link{
+    text-align: center;
+    margin-top: 15px;
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(18px, 4vw, 24px); 
+    font-style: italic;
+}
+
+.link a {
+    color: rgba(0, 87, 146, 1) ;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link a:hover{
+    color:  rgb(58, 151, 212);
+}
+
+/* FORGET PASSWORD / VERIFY/ RESET/ SUCCESS PAGE STYLES*/
+
+.card-1 {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    max-width: 1000px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    
+    
+}
+
+.card-1 img {
+    width: 45%;
+    object-fit: cover;
+    height: auto;
+    display: block;
+}
+
+.card-2 {
+    flex: 1;
+    padding: 50px 40px;  
+    align-self: center;
+}
+
+.card-2 h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.card-2 > p {
+    font-family: 'Crimson Pro', serif; 
+    font-size: 20px; 
+    color: white;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 40px;
+    line-height: 1.5;
+}
+.form-1 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+/*for the verify page only*/
+.code-inputs {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    
+}
+
+.code-inputs input {
+    width: 100%;
+    max-width: 60px;
+    padding: 15px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid black;
+    border-radius: 4px; 
+    font-family: 'Crimson Pro', serif;
+}
+
+/*for reset page*/
+.field-1{
+    flex: 1; /* Make fields take equal space */
+    width: 100%;
+    min-width: 0; /* Prevent overflow */
+    margin-bottom: 12px;
+
+}
+.field-1 label{
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(18px, 4vw, 24px); /* Responsive */
+    font-weight: 400;
+    margin-bottom: 5px;
+    display: block;
+    white-space: nowrap;/*keeps text on one single line*/
+}
+#p3{  /*for reset password page*/
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: black;
+    margin-top: -25px;
+    margin-bottom: 12px;
+}
+
+/*for the success page */
+.card-2 img{
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+button{
+    width: 100%;
+ 
+    background-color: rgba(36, 47, 54, 1);
+    border-radius: 8px;
+    font-family: 'Crimson Pro', serif;    
+    font-style: italic;
+    font-size: clamp(24px, 6vw, 32px);
+    text-align: center;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 50px;
+    
+}
+button:hover {
+    background-color: rgba(48, 62, 71, 1);
+}
