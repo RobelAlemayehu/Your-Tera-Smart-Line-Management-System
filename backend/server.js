@@ -11,6 +11,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const queueRoutes = require('./routes/queueRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const sessionService = require('./services/sessionService');
 
 const app = express();
 
@@ -31,6 +32,10 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/queue', queueRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
+
+setInterval(() => {
+    sessionService.clearExpiredSessions();
+}, 3600000);
 
 // Database Sync and Server Start
 const PORT = process.env.PORT || 5000;

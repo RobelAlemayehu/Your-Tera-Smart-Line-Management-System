@@ -5,6 +5,7 @@ const { User, Accounts, Session, sequelize } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || process.env.JWT_SECRETE;
+const sessionService = require('../services/sessionService');
 
 module.exports = {
     register: async (req, res) => {
@@ -51,10 +52,9 @@ module.exports = {
     },
 
     login: async (req, res) => {
-        try {
-            const { email, password } = req.body;
-        
-        // 1. Find the account and include the associated User info
+    try {
+        const { email, password } = req.body;
+    
         const account = await Accounts.findOne({
             where: { email },
             include: [{ model: User, as: 'User' }]
@@ -64,43 +64,47 @@ module.exports = {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // 2. Compare passwords
         const isMatch = await bcrypt.compare(password, account.password_hash);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        /**
-         * 3. Create the token
-         * CRITICAL FIX: Use 'id' so it matches what your middleware 
-         * and 'getMyStatus' controller are looking for.
-         */
         const token = jwt.sign(
             { id: account.user_id, role: account.User.role }, 
-            process.env.JWT_SECRET || JWT_SECRET, 
+            JWT_SECRET, 
             { expiresIn: '24h' }
         );
 
-        // 4. Handle Session creation
-        const expiryDate = new Date();
-        expiryDate.setHours(expiryDate.getHours() + 24);
+        // 1. Create the session
+        await sessionService.createSession(account.user_id, token);
 
-        await Session.create({
-            session_token: token,
-            user_id: account.user_id,
-            expiry: expiryDate
-        });
-
-        // 5. Send success response
-        res.status(200).json({
+        // 2. Send ONLY ONE response
+        return res.status(200).json({
             message: "Login Successfully!",
             token,
-            user: { 
-                id: account.user_id, 
-                role: account.User.role 
-            }
+            user: { id: account.user_id, role: account.User.role }
         });
 
+        // IMPORTANT: Delete everything after this line inside the login function!
+        // Do not have a second Session.create or second res.status here.
+
+    } catch (error) {
+        // Use 'return' to ensure no further code runs after sending an error
+        return res.status(500).json({ error: error.message });
+    }
+},
+
+    logout: async (req, res) => {
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.split(' ')[1];
+
+            if (token) {
+                // Remove session from the 'sessions' table
+                await sessionService.deleteSession(token); 
+            }
+
+            res.status(200).json({ message: "Logout successful" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
