@@ -1,0 +1,81 @@
+"use client"
+import { useState } from "react"
+import Image from "next/image"
+
+const clients = [
+  {
+    id: "gov",
+    title: "Government Service Officer",
+    location: "Addis Ababa, Ethiopia",
+    quote: "Before using this system, our queues were chaotic. Now everything is organized, digital, and transparent",
+    author: "Henok T., Revenue Officer",
+    avatar: "/images/testimonal1.png",
+  },
+  {
+    id: "telecom",
+    title: "Telecom Customer Support Agent",
+    location: "Hawassa, Ethiopia",
+    quote: "The real-time notifications have transformed how we handle peak hours. Our customers are much happier now.",
+    author: "Sara M., Support Agent",
+    avatar: "/images/testimonal2.png",
+  },
+  {
+    id: "student",
+    title: "AAU Student",
+    location: "Addis Ababa, Ethiopia",
+    quote: "I can now check my position in the queue from my phone. No more wasting hours standing in line.",
+    author: "Abebe K., Student",
+    avatar: "/images/testimonal3.png",
+  },
+]
+
+export default function Testimonials() {
+  const [activeTab, setActiveTab] = useState("gov")
+  const activeClient = clients.find((c) => c.id === activeTab)
+
+  return (
+    <section className="bg-white py-24">
+      <div className="max-w-7xl mx-auto px-6 text-center">
+        <h2 className="text-4xl md:text-5xl font-bold text-[#4A868C] mb-16">Hear From Our Happy Clients</h2>
+
+        <div className="grid md:grid-cols-[1fr_2fr] gap-12 items-start text-left">
+          <div className="space-y-4">
+            {clients.map((client) => (
+              <button
+                key={client.id}
+                onClick={() => setActiveTab(client.id)}
+                className={`w-full text-left p-6 rounded-xl transition-all ${
+                  activeTab === client.id
+                    ? "bg-[#4A868C] text-white"
+                    : "bg-white text-[#4A868C] border-b border-[#4A868C]/20 hover:bg-[#4A868C]/5"
+                }`}
+              >
+                <h4 className="font-bold">{client.title}</h4>
+                <p className={`text-sm ${activeTab === client.id ? "text-white/80" : "text-gray-400"}`}>
+                  {client.location}
+                </p>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-8 items-start pl-8 border-l border-[#4A868C]/20 min-h-[300px]">
+            <div className="space-y-8 max-w-2xl">
+              <p className="text-3xl md:text-4xl font-medium text-[#4A868C] leading-relaxed">"{activeClient.quote}"</p>
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                  <Image
+                    src={activeClient.avatar || "/placeholder.svg"}
+                    alt={activeClient.author}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-gray-500 font-medium">{activeClient.author}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
