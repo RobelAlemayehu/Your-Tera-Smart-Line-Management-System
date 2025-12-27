@@ -1,0 +1,372 @@
+/* ======================
+   RESET
+   ====================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ======================
+   BODY STYLES
+   ====================== */
+body {
+  font-family: "Georgia", serif;
+  
+  
+
+
+ 
+}
+
+/* ======================
+   COMPLETED PAGE
+   ====================== */
+.status-page.completed {
+  min-height: 100vh;
+  background-image: linear-gradient(rgba(0, 195, 208, 0.5), rgba(0, 195, 208, 0.5)),
+                    url('../../assets/confetti.jpg');
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  
+}
+
+.completion-page {
+  width: 100%;
+  max-width: 1100px;
+  text-align: center;
+}
+
+.completion-page h1 {
+  font-size: 3rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.completion-page .subtitle {
+  font-size: 1.4rem;
+  margin-bottom: 2.5rem;
+}
+
+.completion-page .summary-card {
+  background: #3E818B;
+  color: #D0D0D0;
+  padding: 2.5rem 3rem;
+  border-radius: 18px;
+  box-shadow: 0 15px 25px rgba(0,0,0,0.25);
+  margin-bottom: 3.5rem;
+  text-align: left;
+}
+
+.completion-page .summary-card p {
+  font-size: 1.3rem;
+  margin-bottom: 1.2rem;
+}
+
+.completion-page .summary-card span {
+  color: #18C6E1;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.completion-page .actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.completion-page .btn {
+  padding: 1rem 3rem;
+  font-size: 1.3rem;
+  font-style: italic;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.completion-page .btn.primary,
+.completion-page .btn.secondary {
+  background: #242F36;
+  color: #ffffff;
+}
+
+.completion-page .btn:hover {
+  background: #5DB2C7;
+}
+
+/* ======================
+   WAITING PAGE
+   ====================== */
+.status-page.waiting {
+  background: #ffffff;
+  color: #111;
+  padding: 2rem;
+}
+
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.top-section {
+  display: flex;
+  gap: 3rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+.queue-card {
+  background: #5DB2C7;
+  color: #3C250D;
+  flex: 1;
+  max-width: 360px;
+  padding: 2.5rem;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.queue-card .label {
+  font-size: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.queue-card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.queue-status {
+  max-width: 450px;
+  text-align: center;
+  flex: 2;
+}
+
+.icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.queue-status h2 {
+  font-size: 1.4rem;
+}
+
+.subtext {
+  margin-bottom: 1.5rem;
+}
+
+.progress-wrapper {
+  margin: 1.5rem 0;
+}
+
+.progress-label {
+  display: block;
+  text-align: left;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #6B7075;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #18C6E1;
+  border-radius: 10px;
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+.leave-btn {
+  font-style: italic;
+  margin-top: 1.8rem;
+  padding: 0.8rem 2.5rem;
+  background: #242F36;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.leave-btn:hover {
+  background: #5DB2C7;
+}
+
+.tips {
+  margin-top: 3rem;
+  background: #3E818B;
+  color: #000;
+  padding: 1.5rem 2rem;
+  border-radius: 14px;
+  width: 100%;
+}
+
+.tips h4 {
+  margin-bottom: 0.8rem;
+}
+
+.tips ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.tips li {
+  margin-bottom: 0.4rem;
+}
+
+/* ======================
+   CANCELED PAGE
+   ====================== */
+.status-page.canceled {
+  min-height: 100vh;
+  background: #9CA8B2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  
+}
+
+.cancel-page {
+  width: 100%;
+  max-width: 1100px;
+  text-align: center;
+}
+
+.cancel-page h1 {
+  font-size: 3rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.cancel-page .subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.cancel-page .summary-card {
+  background: #3A3A3B;
+  color: #D0D0D0;
+  padding: 2.8rem 3rem;
+  border-radius: 14px;
+  box-shadow: 0 12px 22px rgba(0,0,0,0.35);
+  margin-bottom: 2.8rem;
+  text-align: left;
+}
+
+.cancel-page .summary-card p {
+  font-size: 1.3rem;
+  margin-bottom: 1.4rem;
+}
+
+.cancel-page .summary-card span {
+  color: #6B644C;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.cancel-page .next-text {
+  font-size: 1.3rem;
+  margin-bottom: 3rem;
+}
+
+.cancel-page .actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.cancel-page .btn {
+  background: #242F36;
+  color: #ffffff;
+  border: none;
+  padding: 1rem 3rem;
+  font-size: 1.3rem;
+  font-style: italic;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cancel-page .btn:hover {
+  background: #5DB2C7;
+}
+
+/* ======================
+   RESPONSIVE DESIGN
+   ====================== */
+@media (max-width: 768px) {
+  .completion-page h1,
+  .cancel-page h1 {
+    font-size: 2.4rem;
+  }
+
+  .summary-card {
+    padding: 2rem;
+  }
+
+  .summary-card p {
+    font-size: 1.1rem;
+  }
+
+  .completion-page .actions,
+  .cancel-page .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .top-section {
+    flex-direction: column;
+  }
+
+  .queue-card,
+  .queue-status {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 1rem;
+  }
+
+  .completion-page h1,
+  .cancel-page h1 {
+    font-size: 2rem;
+  }
+
+  .completion-page .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .cancel-page .subtitle {
+    font-size: 1.2rem;
+  }
+
+  .queue-card {
+    padding: 2rem;
+  }
+
+  .leave-btn {
+    width: 100%;
+  }
+}
