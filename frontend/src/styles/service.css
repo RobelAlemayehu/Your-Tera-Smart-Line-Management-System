@@ -1,0 +1,74 @@
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #222;
+}
+
+/* ================= CONTENT ================= */
+.container {
+    max-width: 1400px;
+    margin: 70px 15px 0;
+    padding: 0 80px;
+}
+
+.container h1 {
+    font-size: 24px;
+    font-weight: 100;
+    margin-bottom: 30px;
+}
+
+.container p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 90px;
+}
+
+
+
+/* ================= CARDS ================= */
+.cards {
+    display: flex;
+    gap: 60px;
+}
+
+.card {
+    width: 400px;
+    height: 180px;
+    background: #3E818B;
+    border-radius: 10px;
+    padding: 16px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 100px;
+}
+
+.card h3 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-top: 80px;
+    margin-bottom: 8px;
+    
+}
+
+.card p {
+    font-size: 13px;
+    opacity: 0.9;
+    color: #ffffff;
+    margin-left: 4px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+    .cards {
+        flex-direction: column;
+    }
+}

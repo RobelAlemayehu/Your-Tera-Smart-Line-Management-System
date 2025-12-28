@@ -1,0 +1,96 @@
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #222;
+}
+
+/* ================= CONTENT ================= */
+.container {
+    max-width: 1400px;
+    margin: 90px 15px 0;
+    padding: 0 80px;
+}
+
+.container h1 {
+    font-size: 24px;
+    font-weight: 100;
+    margin-bottom: 30px;
+}
+
+.container p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 130px;
+}
+
+
+
+/* ================= CARDS ================= */
+.cards {
+    display: flex;
+    gap: 60px;
+}
+
+.card {
+    width: 400px;
+    min-height: 250px;
+    background: #3E818B;
+    border-radius: 10px;
+    padding: 20px 24px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+.card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    
+    
+}
+
+.card p {
+    font-size: 13px;
+    opacity: 0.9;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* .schedule {
+  color: #ffffff;
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: auto;
+  text-align: center;
+} */
+.schedule {
+  margin-top: auto;          /* pushes it to bottom */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  opacity: 0.9;
+  color: #ffffff;
+}
+
+
+
+
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+    .cards {
+        flex-direction: column;
+    }
+}

@@ -123,6 +123,11 @@ main {
   background-color: #3D6E73;
 }
 
+.bell {
+    width: 16px;
+    height: 16px;
+}
+
 /* Hero Styles */
 .hero {
   max-width: 1200px;
