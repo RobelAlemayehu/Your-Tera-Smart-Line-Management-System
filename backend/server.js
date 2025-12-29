@@ -43,9 +43,11 @@ const PORT = process.env.PORT || 5000;
 sequelize.authenticate()
     .then(() => {
         console.log('Database connected successfully.');
-        return sequelize.sync(); 
+        // FIXED: Using alter: true ensures columns are renamed/added for the whole team automatically
+        return sequelize.sync({ alter: true }); 
     })
     .then(() => {
+        console.log("Database synced and columns corrected for the whole team.");
         app.listen(PORT, () => {
             console.log(` Server is running on http://localhost:${PORT}`);
         });

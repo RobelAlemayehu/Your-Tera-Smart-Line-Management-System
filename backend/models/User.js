@@ -17,29 +17,21 @@ module.exports = (sequelize, DataTypes) => {
             },
             password: {
                 type: DataTypes.STRING,
-                allowNull: false,
-                get() {
-                     return "********"; // This hides the real value when reading data
-                }
+                allowNull: false
             },
-            phone_number: {
-                type: DataTypes.STRING,
-                allowNull: true 
-            },
-            username: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
+            phone_number: { type: DataTypes.STRING },
+            username: { type: DataTypes.STRING },
             role: {
                 type: DataTypes.ENUM('Customer', 'Admin', 'Student'),
                 defaultValue: 'Customer'
-            }
+            },
+            reset_code: { type: DataTypes.STRING(4), allowNull: true },
+            reset_expiry: { type: DataTypes.DATE, allowNull: true }
         },
         {
             tableName: 'Users',
             timestamps: false,
             underscored: true,
-            
             defaultScope: {
                 attributes: { exclude: ['password'] }
             },
@@ -52,10 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     User.associate = function(models) {
-        if (models.Accounts) {
-            User.hasOne(models.Accounts, { foreignKey: 'user_id', as: 'account' });
-        }
+        User.hasOne(models.Accounts, { foreignKey: 'user_id', as: 'account' });
     };
-
     return User;
 };
