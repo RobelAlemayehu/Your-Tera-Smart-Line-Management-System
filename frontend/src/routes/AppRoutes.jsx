@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Public
 import Landing from "../pages/public/Landing";
@@ -8,10 +8,12 @@ import Services from "../pages/public/Services";
 import ServiceDetail from "../pages/public/ServiceDetail";
 
 // Auth
-import SignIn from "../pages/auth/SignIn";
-import SignUp from "../pages/auth/SignUp";
-import ForgotPassword from "../pages/auth/ForgotPassword";
+import  SignUp  from '../pages/auth/SignUp';
+import  SignIn  from '../pages/auth/SignIn';
+import ForgetPassword from '../pages/auth/ForgotPassword';
+import Verify from "../pages/auth/Verify";
 import ResetPassword from "../pages/auth/ResetPassword";
+import Success from "../pages/auth/Success";
 
 // User
 import Status from "../pages/user/Status";
@@ -30,8 +32,10 @@ const AppRoutes = () => {
 
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/forgotpassword" element={<ForgetPassword />} />
+      <Route path="/verify" element={<Verify />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/success" element={<Success />} />
 
       <Route path="/status" element={<Status />} />
       <Route path="/notifications" element={<Notifications />} />
