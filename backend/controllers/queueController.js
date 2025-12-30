@@ -60,7 +60,7 @@ exports.getOfficeQueue = async (req, res) => {
 
 exports.getMyStatus = async (req, res) => {
     try {
-        const userId = req.user.id; 
+        const userId = req.user.user_id || req.user.id; 
         const tickets = await queueService.getMyActiveTickets(userId);
 
         if (!tickets || tickets.length === 0) {

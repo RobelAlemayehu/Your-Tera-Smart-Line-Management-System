@@ -98,6 +98,16 @@ const updateTicketStatus = async (ticket_id, status) => {
     return ticket;
 };
 
+// GET ALL TICKETS FOR ADMIN
+const getAllTickets = async () => {
+    return await QueueTicket.findAll({
+        include: [
+            { model: User, as: 'user', attributes: ['user_id', 'username', 'email', 'phone_number'] },
+            { model: Service, as: 'service', attributes: ['service_id', 'service_name'] }
+        ],
+        order: [['created_at', 'DESC']]
+    });
+};
 
 module.exports = { 
     getQueueAnalytics, 
@@ -107,6 +117,6 @@ module.exports = {
     getAllUsers, 
     updateUserRole, 
     toggleServiceStatus, 
-    updateTicketStatus, 
-    getQueueAnalytics  
+    updateTicketStatus,
+    getAllTickets
 };

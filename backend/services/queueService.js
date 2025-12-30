@@ -107,5 +107,31 @@ module.exports = {
             position: peopleAhead + 1,
             estimatedWaitTime: peopleAhead * waitPerPerson
         };
+    },
+
+    // 7. Get Queue By Service (for office view)
+    getQueueByService: async (service_id) => {
+        return await QueueTicket.findAll({
+            where: { service_id },
+            include: [
+                { model: User, as: 'user', attributes: ['user_id', 'username', 'email'] },
+                { model: Service, as: 'service', attributes: ['service_id', 'service_name'] }
+            ],
+            order: [['ticket_number', 'ASC']]
+        });
+    },
+
+    // 8. Get My Active Tickets
+    getMyActiveTickets: async (user_id) => {
+        return await QueueTicket.findAll({
+            where: {
+                user_id: user_id,
+                status: ['Waiting', 'Serving']
+            },
+            include: [
+                { model: Service, as: 'service', attributes: ['service_id', 'service_name'] }
+            ],
+            order: [['created_at', 'DESC']]
+        });
     }
 };

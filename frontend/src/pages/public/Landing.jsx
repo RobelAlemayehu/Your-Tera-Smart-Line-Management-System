@@ -7,11 +7,12 @@ import Footer from "@/components/layout/footer"
 
 export default function LandingPage() {
   return (
-    <main>
+    <main style={{ backgroundColor: 'white', width: '100vw', margin: 0, padding: 0 }}>
       <Navbar />
       <Hero />
-      <ServicesHeader />
+      
       <FeatureCards />
+      <ServicesHeader />
       <Testimonials />
       <Footer />
     </main>

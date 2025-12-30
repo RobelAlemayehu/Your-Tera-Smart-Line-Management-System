@@ -1,26 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import Rectangle34 from '../../assets/images/Rectangle34.png';
-import '../../styles/auth.css';
+import Rectangle34 from "../../assets/images/Rectangle34.png";
+import "../../styles/auth.css";
 
-function ResetPassword(){
-
+function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email; // get email from Verify page
+  const email = location.state?.email;
 
-    
+  useEffect(() => {
+    document.body.classList.add("auth-page");
+    return () => {
+      document.body.classList.remove("auth-page");
+    };
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (newPassword.length < 6) {
-      alert("Password must be at least 6 characters");
+    if (newPassword.length < 8) {
+      alert("Password must be at least 8 characters");
       return;
     }
 
@@ -42,7 +48,7 @@ function ResetPassword(){
       setLoading(false);
 
       if (data.success) {
-        navigate("/success"); // navigate to Success page
+        navigate("/success");
       } else {
         alert(data.message || "Failed to reset password");
       }
@@ -56,44 +62,65 @@ function ResetPassword(){
     }
   };
 
+  return (
+    <div className="card-1">
+      <img src={Rectangle34} alt="Reset Password" />
 
-    return(
-            <div className="card-1">
-        <img src={Rectangle34} />
-    
-        <div className="card-2">
-            <h1>Forgot Password</h1>
-            <p>Please enter your Email or Phone Number to receive confirmation code</p>
+      <div className="card-2 reset-card">
+        <h1 className="reset-title">Reset Password</h1>
+        <p className="reset-subtitle">please create your new password</p>
 
-         <form  className="form-1" onSubmit={handleSubmit}>
-              <div className="field-1">
-                <label>New Password</label>
-                <input type="password" 
-                placeholder=" Password" 
+        <form className="form-1" onSubmit={handleSubmit}>
+          <div className="field-1">
+            <label>New Password</label>
+            <div className="password-input-wrapper">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                required />
+                required
+                minLength={8}
+              />
+              <button
+                type="button"
+                className="toggle-visibility"
+                onClick={() => setShowNewPassword((v) => !v)}
+              >
+                👁
+              </button>
             </div>
-            <p id="p3">must contain at least 6 characters</p>
+            <p className="reset-hint">Must contain at least 8 characters</p>
+          </div>
 
-            <div className="field-1">
-                <label>Confirm Password</label>
-                <input type="password" 
-                placeholder="Confirm Password" 
+          <div className="field-1">
+            <label>Confirm Password</label>
+            <div className="password-input-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                required />
+                required
+                minLength={8}
+              />
+              <button
+                type="button"
+                className="toggle-visibility"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+              >
+                👁
+              </button>
             </div>
-         <button type="submit" disabled={loading}>
+          </div>
+
+          <button type="submit" disabled={loading}>
             {loading ? "Confirming..." : "Confirm Password"}
           </button>
-          
-       </form>
-
-        </div>
+        </form>
+      </div>
     </div>
-    );
-    
+  );
 }
 
 export default ResetPassword;

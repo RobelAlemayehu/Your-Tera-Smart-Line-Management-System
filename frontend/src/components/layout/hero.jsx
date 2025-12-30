@@ -13,8 +13,8 @@ const Hero = () => {
         <h1 className="hero-title">
           Smart Line Management System
         </h1>
-        <p className="hero-subtitle">Reduce waiting time, Get Notified instantly, and transform your service experience with our intelligent queue management solution.</p>
-        <div className="hero-features">
+        <p className="hero-subtitle">Reduce waiting time, Get Notified.</p>
+        {/* <div className="hero-features">
           <div className="feature-item">
             <span className="feature-icon"></span>
             <span>Real-time Updates</span>
@@ -26,8 +26,8 @@ const Hero = () => {
           <div className="feature-item">
             <span className="feature-icon"></span>
             <span>Smart Notifications</span>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
         <button className="hero-btn" onClick={() => navigate('/signup')}>
             Get Started
           </button>

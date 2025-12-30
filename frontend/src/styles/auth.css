@@ -1,179 +1,387 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Modern sign-in/sign-up layout */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, hsl(186, 91%, 33%), #077c87);
+    font-family: "Inter", sans-serif;
+    padding: 24px;
 }
 
-body{
-    background: linear-gradient(180deg, rgba(62, 129, 139, 1), rgba(5, 63, 71, 1));
+.auth-card {
+    width: 420px;
+    background: #aeb9c1;
+    padding: 32px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.auth-card h1 {
+    text-align: center;
+    font-family: serif;
+    margin-bottom: 24px;
+}
+
+.auth-card .google-btn {
+    width: 100%;
+    padding: 10px;
+    background: #4f8f96;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.auth-card .google-btn:hover {
+    opacity: 0.9;
+}
+
+.auth-card .divider {
+    text-align: center;
+    margin: 16px 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.auth-card .row {
+    display: flex;
+    gap: 12px;
+}
+
+.auth-card .field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+    flex: 1;
+}
+
+.auth-card .field label {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.auth-card .field input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #7d8c94;
+    background: #c1cbd2;
+}
+
+.auth-card .field input:focus {
+    outline: none;
+    border-color: #0f7a85;
+}
+
+.auth-card .field select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #7d8c94;
+    background: #c1cbd2;
+}
+
+.auth-card .field select:focus {
+    outline: none;
+    border-color: #0f7a85;
+}
+
+.auth-card .field small {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.auth-card .forgot-password-link {
+    margin-top: 8px;
+    text-align: right;
+    font-size: 12px;
+}
+
+.auth-card .forgot-password-link span {
+    color: #0b4dd8;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.auth-card .forgot-password-link span:hover {
+    text-decoration: underline;
+}
+
+.auth-card .terms {
+    font-size: 12px;
+    margin: 10px 0 20px;
+}
+
+.auth-card .terms span {
+    color: #0b4dd8;
+    cursor: pointer;
+}
+
+.auth-card .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: #26323a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.auth-card .submit-btn:hover {
+    opacity: 0.9;
+}
+
+.auth-card .submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.auth-card .switch {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+}
+
+.auth-card .switch span {
+    color: #0b4dd8;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .auth-card {
+        width: 100%;
+    }
+}
+
+/* Auth page specific styles */
+body.auth-page {
+    background: linear-gradient(135deg, #4A868C 0%, #3D6E73 50%, #2D5A5F 100%) !important;
     width: 100%;
     min-height: 100vh;
     padding: 20px;
-    Gap: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow-x: hidden;
-    
+    margin: 0;
+    box-sizing: border-box;
 }
 
+/* SIGN IN & SIGN UP PAGE STYLES */
 
-
-/*SIGN IN & SIGN UP PAGE STYLES*/
-
-.card{
-    background-color: rgba(156, 168, 178, 1);
-    border-radius: 25.78px;
-    border: 1.29px solid rgba(48, 78, 97, 1);
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    padding: 40px 30px ;
-    width: 100%;  
-    max-width: 1000px; 
-    min-width: 300px; 
-     /* Center the card */
+    padding: 50px 40px;
+    width: 100%;
+    max-width: 450px;
+    min-width: 300px;
     margin: 0 auto;
-
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-h1{
-    font-family: 'Crimson Pro', serif;
-    font-size:  clamp(36px, 8vw, 72px); /* Responsive font size */
-    font-weight: 400;
-    line-height: 100%;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
     text-align: center;
-    font-style: italic;
     margin-bottom: 30px;
-    
+    color: #2D4A4D;
+    background: linear-gradient(135deg, #4A868C, #2D5A5F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-.row{
+.row {
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 15px;
     width: 100%;
-    margin-bottom: 12px;
-}
-/* Make row responsive */
-@media (max-width: 768px) {
-    .row {
-        flex-direction: column; /* Stack on mobile */
-        gap: 15px;
-    }
-}
-.field{
-    flex: 1; /* Make fields take equal space */
-    width: 100%;
-    min-width: 0; /* Prevent overflow */
-    margin-bottom: 12px;
-
-}
-.field label{
-    font-family: 'Crimson Pro', serif;
-    font-size: clamp(18px, 4vw, 24px); /* Responsive */
-    font-weight: 400;
-    margin-bottom: 5px;
-    display: block;
-    white-space: nowrap;/*keeps text on one single line*/
-}
-
-input{
-    width: 100%;
-    padding: 10px;
-    margin-top: 4px;
-    border: 1px solid black;
-    border-radius: 4px; 
-    font-size: 16px;
-    font-family: 'Crimson Pro', serif;
-}
-#p1{  /*for signup*/
-    font-family: 'Crimson Pro', serif;
-    font-size: 14px;
-    font-weight: 400;
-    color: black;
-    margin-top: -8px;
-    margin-bottom: 12px;
-}
-
-#p2{   /*for Signin page*/
-    font-family: 'Crimson Pro', serif;
-    font-size: 24px;
-    font-weight: 400;   
-    margin-top: -8px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: flex-end;
-}
-#p2 a {
-    text-decoration: none;
-    color: rgba(0, 87, 146, 1);
-}
-#p2 a:hover{
-    color:  rgb(58, 151, 212);
-}
-.terms{
-    font-family: 'Crimson Pro', serif;
-    font-size:  clamp(16px, 3vw, 20px); /* Responsive */
-    font-weight: 500;
-    margin-top: 10px;
     margin-bottom: 20px;
 }
 
-.terms a{
-    color: black;
-    text-decoration: none;
-}
-.terms a:hover {
-    color: blue;
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
 
-.btn-btn{
+.field {
+    flex: 1;
     width: 100%;
-    height: 60px;
-    background-color: rgba(36, 47, 54, 1);
-    border-radius: 8px;
-    font-family: 'Crimson Pro', serif;
-    font-size: clamp(24px, 6vw, 48px);
-    font-style: italic;
+    min-width: 0;
+    margin-bottom: 20px;
+}
+
+.field label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: #4A868C;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input {
+    width: 100%;
+    padding: 15px 18px;
+    margin-top: 4px;
+    border: 2px solid rgba(74, 134, 140, 0.2);
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4A868C;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(74, 134, 140, 0.1);
+    transform: translateY(-2px);
+}
+
+input::placeholder {
+    color: #999;
+    font-weight: 400;
+}
+
+#p1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #666;
+    margin-top: -15px;
+    margin-bottom: 20px;
+}
+
+#p2 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: -10px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#p2 a {
+    text-decoration: none;
+    color: #4A868C;
+    transition: color 0.3s ease;
+}
+
+#p2 a:hover {
+    color: #2D5A5F;
+}
+
+.terms {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 15px;
+    margin-bottom: 25px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.terms a {
+    color: #4A868C;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 4px;
+    transition: color 0.3s ease;
+}
+
+.terms a:hover {
+    color: #2D5A5F;
+}
+
+.btn-btn {
+    width: 100%;
+    height: 55px;
+    background: linear-gradient(135deg, #4A868C 0%, #3D6E73 100%);
+    border: none;
+    border-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
     text-align: center;
     color: white;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 5px;
-}
-.btn-btn:hover {
-    background-color: rgba(48, 62, 71, 1);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(74, 134, 140, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.link{
+.btn-btn:hover {
+    background: linear-gradient(135deg, #3D6E73 0%, #2D5A5F 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 134, 140, 0.4);
+}
+
+.btn-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.link {
     text-align: center;
-    margin-top: 15px;
-    font-family: 'Crimson Pro', serif;
-    font-size: clamp(18px, 4vw, 24px); 
-    font-style: italic;
+    margin-top: 25px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 14px;
+    color: #666;
 }
 
 .link a {
-    color: rgba(0, 87, 146, 1) ;
+    color: #4A868C;
     text-decoration: none;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.link a:hover{
-    color:  rgb(58, 151, 212);
+.link a:hover {
+    color: #2D5A5F;
 }
 
-/* FORGET PASSWORD / VERIFY/ RESET/ SUCCESS PAGE STYLES*/
+/* FORGET PASSWORD / VERIFY/ RESET/ SUCCESS PAGE STYLES */
 
 .card-1 {
     display: flex;
     flex-direction: row;
     overflow: hidden;
-    max-width: 1000px;
+    max-width: 900px;
     width: 100%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    
-    
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card-1:hover {
+    transform: translateY(-5px);
 }
 
 .card-1 img {
@@ -181,107 +389,231 @@ input{
     object-fit: cover;
     height: auto;
     display: block;
+    border-radius: 20px 0 0 20px;
 }
 
 .card-2 {
     flex: 1;
-    padding: 50px 40px;  
+    padding: 50px 40px;
     align-self: center;
+    background: linear-gradient(135deg, rgba(74, 134, 140, 0.05), rgba(74, 134, 140, 0.1));
+}
+
+.reset-card {
+    background: transparent;
+}
+
+.reset-title {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 28px;
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 16px;
+    color: #ffffff;
+}
+
+.reset-subtitle {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 32px;
 }
 
 .card-2 h1 {
-    font-family: 'Crimson Pro', serif;
-    font-size: 32px;
-    font-weight: 400;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
     line-height: 1.2;
     text-align: center;
-    font-style: italic;
     margin-bottom: 20px;
-    color: white;
+    color: #2D4A4D;
+    background: linear-gradient(135deg, #4A868C, #2D5A5F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .card-2 > p {
-    font-family: 'Crimson Pro', serif; 
-    font-size: 20px; 
-    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #666;
     text-align: center;
-    margin-top: 50px;
-    margin-bottom: 40px;
-    line-height: 1.5;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    line-height: 1.6;
 }
+
 .form-1 {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
-
-/*for the verify page only*/
+/* For the verify page only */
 .code-inputs {
     display: flex;
     justify-content: space-between;
     gap: 10px;
     width: 100%;
-    
 }
 
 .code-inputs input {
     width: 100%;
     max-width: 60px;
     padding: 15px;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 600;
     text-align: center;
-    border: 1px solid black;
-    border-radius: 4px; 
-    font-family: 'Crimson Pro', serif;
+    border: 2px solid rgba(74, 134, 140, 0.2);
+    border-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
 }
 
-/*for reset page*/
-.field-1{
-    flex: 1; /* Make fields take equal space */
+.code-inputs input:focus {
+    border-color: #4A868C;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(74, 134, 140, 0.1);
+    transform: translateY(-2px);
+}
+
+/* For reset page */
+.field-1 {
+    flex: 1;
     width: 100%;
-    min-width: 0; /* Prevent overflow */
-    margin-bottom: 12px;
+    min-width: 0;
+    margin-bottom: 20px;
+}
 
-}
-.field-1 label{
-    font-family: 'Crimson Pro', serif;
-    font-size: clamp(18px, 4vw, 24px); /* Responsive */
-    font-weight: 400;
-    margin-bottom: 5px;
-    display: block;
-    white-space: nowrap;/*keeps text on one single line*/
-}
-#p3{  /*for reset password page*/
-    font-family: 'Crimson Pro', serif;
+.field-1 label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     font-size: 14px;
-    font-weight: 400;
-    color: black;
-    margin-top: -25px;
-    margin-bottom: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: #4A868C;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/*for the success page */
-.card-2 img{
+#p3 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #666;
+    margin-top: -15px;
+    margin-bottom: 20px;
+}
+
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrapper input {
+    padding-right: 48px;
+}
+
+.toggle-visibility {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    margin-top: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #2D5A5F;
+}
+
+.toggle-visibility:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-50%);
+}
+
+.reset-hint {
+    font-size: 11px;
+    color: #ffffff;
+    margin-top: 6px;
+}
+
+/* For the success page */
+.card-2 img {
     display: block;
     margin: 0 auto 20px auto;
+    filter: drop-shadow(0 4px 8px rgba(74, 134, 140, 0.3));
 }
 
-button{
+button {
     width: 100%;
- 
-    background-color: rgba(36, 47, 54, 1);
-    border-radius: 8px;
-    font-family: 'Crimson Pro', serif;    
-    font-style: italic;
-    font-size: clamp(24px, 6vw, 32px);
+    height: 55px;
+    background: linear-gradient(135deg, #4A868C 0%, #3D6E73 100%);
+    border: none;
+    border-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
     text-align: center;
     color: white;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 50px;
-    
+    transition: all 0.3s ease;
+    margin-top: 30px;
+    box-shadow: 0 4px 15px rgba(74, 134, 140, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
+
 button:hover {
-    background-color: rgba(48, 62, 71, 1);
+    background: linear-gradient(135deg, #3D6E73 0%, #2D5A5F 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 134, 140, 0.4);
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .card {
+        padding: 30px 25px;
+        max-width: 100%;
+        margin: 10px;
+    }
+    
+    .card-1 {
+        flex-direction: column;
+        max-width: 100%;
+        margin: 10px;
+    }
+    
+    .card-1 img {
+        width: 100%;
+        height: 200px;
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .card-2 {
+        padding: 30px 25px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    .card-2 h1 {
+        font-size: 24px;
+    }
 }

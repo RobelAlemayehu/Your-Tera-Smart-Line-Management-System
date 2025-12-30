@@ -108,3 +108,12 @@ exports.patchTicket = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+exports.getAllTickets = async (req, res) => {
+    try {
+        const tickets = await adminService.getAllTickets();
+        res.json(tickets);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
