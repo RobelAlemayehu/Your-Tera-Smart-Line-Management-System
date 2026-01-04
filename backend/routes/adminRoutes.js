@@ -1,27 +1,24 @@
-
 'use strict';
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const { verifyToken } = require('../middlewares/authMiddleware');
 const roleMiddleware = require('../middlewares/roleMiddleware');
 
-// Only Admins/Staff should be able to call the next customer
-router.patch('/next', authMiddleware, roleMiddleware('Admin'), adminController.callNext);
-router.patch('/complete/:id', authMiddleware, roleMiddleware('Admin'), adminController.completeTicket);
-
-const { verifyToken, isAdmin } = require('../middlewares/authMiddleware');
-
+// Admin routes
 router.get('/analytics', adminController.getAnalytics);
-router.get('/tickets', verifyToken, isAdmin, adminController.getAllTickets);
-router.delete('/tickets/:service_id', adminController.deleteServiceTickets);
-// router.delete('/services/:service_id/tickets/:ticket_id', adminController.deleteTicket);
-router.post('/services', adminController.addService);
+router.get('/tickets', verifyToken, roleMiddleware('Admin'), adminController.getAllTickets);
+router.get('/users', verifyToken, roleMiddleware('Admin'), adminController.getUsers);
 
-router.get('/users', verifyToken, isAdmin, adminController.getUsers);
-router.patch('/users/:user_id/role', adminController.changeRole);
-router.patch('/services/:service_id', adminController.patchService);
-router.patch('/tickets/:ticket_id/status', adminController.patchTicket);
-router.delete('/services/:serviceId/tickets/:ticketId', verifyToken, isAdmin, adminController.adminDeleteTicket);
+router.post('/services', verifyToken, roleMiddleware('Admin'), adminController.addService);
+
+router.patch('/next', verifyToken, roleMiddleware('Admin'), adminController.callNext);
+router.patch('/complete/:id', verifyToken, roleMiddleware('Admin'), adminController.completeTicket);
+router.patch('/users/:user_id/role', verifyToken, roleMiddleware('Admin'), adminController.changeRole);
+router.patch('/services/:service_id', verifyToken, roleMiddleware('Admin'), adminController.patchService);
+router.patch('/tickets/:ticket_id/status', verifyToken, roleMiddleware('Admin'), adminController.patchTicket);
+
+router.delete('/tickets/:service_id', verifyToken, roleMiddleware('Admin'), adminController.deleteServiceTickets);
+router.delete('/services/:serviceId/tickets/:ticketId', verifyToken, roleMiddleware('Admin'), adminController.adminDeleteTicket);
 
 module.exports = router;

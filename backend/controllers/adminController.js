@@ -131,5 +131,14 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+    },
+
+    addService: async (req, res) => {
+        try {
+            const service = await adminService.createService(req.body);
+            res.status(201).json({ message: "Service created successfully", service });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
     }
 };

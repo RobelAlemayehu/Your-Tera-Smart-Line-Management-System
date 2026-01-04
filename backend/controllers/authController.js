@@ -114,7 +114,28 @@ module.exports = {
         }
     },
 
-    // 5. RESET PASSWORD: Updates password across User and Accounts tables
+    // 5. VERIFY RESET CODE: Validates the reset code
+    verifyResetCode: async (req, res) => {
+        try {
+            const { phone_number, code } = req.body;
+            const user = await User.findOne({ 
+                where: { 
+                    phone_number: phone_number, 
+                    reset_code: code
+                } 
+            });
+
+            if (!user || user.reset_expiry < Date.now()) {
+                throw new Error("Invalid or expired code.");
+            }
+
+            res.status(200).json({ message: "Code verified. You may now reset your password." });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    },
+
+    // 6. RESET PASSWORD: Updates password across User and Accounts tables
     resetPassword: async (req, res) => {
         const { phone_number, code, newPassword } = req.body;
         const t = await sequelize.transaction(); 
