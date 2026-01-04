@@ -1,32 +1,44 @@
 'use strict';
-
-const { Office } = require('../models');
+const officeService = require('../services/officeService');
 
 module.exports = {
-    getOffice: async (req, res) => {
+    // List all offices
+    getOffices: async (req, res) => {
         try {
-            const offices = await Office.findAll();
+            const offices = await officeService.getAllOffices();
             res.status(200).json(offices);
-        } catch (error) { // Added (error) here
+        } catch (error) {
             res.status(500).json({ error: error.message });
         }
     },
 
+    // Add a new office
     addOffice: async (req, res) => {
         try {
-            // Check your Model! If your DB columns are 'office_name', 
-            // make sure these match.
-            const { office_name, location, type } = req.body; 
-            
-            const newOffice = await Office.create({ 
-                office_name, 
-                location, 
-                type 
-            });
-            
+            const newOffice = await officeService.createOffice(req.body);
             res.status(201).json(newOffice);
-        } catch (error) { // Added (error) here
+        } catch (error) {
             res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Update an office
+    updateOffice: async (req, res) => {
+        try {
+            const updated = await officeService.updateOffice(req.params.id, req.body);
+            res.status(200).json(updated);
+        } catch (error) {
+            res.status(404).json({ error: error.message });
+        }
+    },
+
+    // Delete an office
+    deleteOffice: async (req, res) => {
+        try {
+            await officeService.deleteOffice(req.params.id);
+            res.status(200).json({ message: "Office deleted successfully" });
+        } catch (error) {
+            res.status(404).json({ error: error.message });
         }
     }
 };

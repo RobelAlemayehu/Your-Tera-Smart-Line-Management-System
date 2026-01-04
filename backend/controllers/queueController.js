@@ -1,59 +1,47 @@
-/**
- * Queue Controller - Handles HTTP requests for the ticketing system.
- * This file acts as the interface between the React frontend and your QueueService.
- */
 const queueService = require('../services/queueService');
 
 // 1. Join a Queue (Citizen action)
 exports.join = async (req, res) => {
     try {
-        /** * IMPORTANT: req.user.id is populated by your teammate's Auth Middleware.
-         * The frontend must send 'serviceId' and 'officeId' in the JSON body.
-         */
+        // Use the same names your frontend will send in the JSON body
+        const { serviceId, officeId, phone_number } = req.body;
+
+        // Ensure req.user exists (if using Auth) or use a fallback for testing
+        const userId = req.user ? req.user.id : req.body.userId; 
+
         const ticket = await queueService.joinQueue(
-            req.user.id, 
-            req.body.serviceId, 
-            req.body.officeId
+            userId, 
+            serviceId, 
+            officeId,
+            phone_number // Matches the 4th argument in your Service
         );
 
-        // Success: Send the ticket details back to React
         res.status(201).json({
+            success: true,
             message: "Successfully joined the queue",
             ticket
         });
     } catch (error) {
-        // Error handling: e.g., "Queue is full" or "Already in queue"
-        res.status(400).json({ error: error.message });
+        // Logging the error helps you debug during frontend integration
+        console.error("Join Queue Error:", error.message);
+        res.status(400).json({ success: false, error: error.message });
     }
 };
 
-// 2. Get Live Status (Citizen action)
-// The frontend will call this every 10 seconds to update the UI
-exports.getTicketStatus = async (req, res) => {
-    try {
-        const { ticketId } = req.params;
-        const status = await queueService.getLiveStatus(ticketId);
-        
-        res.status(200).json(status);
-    } catch (error) {
-        res.status(404).json({ error: "Ticket not found" });
-    }
-};
-
-// 3. Update Ticket Status (Admin action)
-// Used when a staff member calls the "Next" person
+// 2. Update Ticket Status (Staff action)
 exports.updateStatus = async (req, res) => {
     try {
         const { ticketId } = req.params;
-        const { status } = req.body; // e.g., 'served', 'skipped', 'delayed'
+        const { status } = req.body; 
 
         const updatedTicket = await queueService.updateTicketStatus(ticketId, status);
         
         res.status(200).json({
+            success: true,
             message: `Ticket marked as ${status}`,
             updatedTicket
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ success: false, error: error.message });
     }
 };

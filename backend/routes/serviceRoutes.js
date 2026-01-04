@@ -3,13 +3,25 @@ const express = require('express');
 const router = express.Router();
 const serviceController = require('../controllers/serviceController');
 const authMiddleware = require('../middlewares/authMiddleware');
-const roleMiddleware = require('../middlewares/roleMiddleware');
 
-// Anyone logged in can see the list of services
-router.get('/', authMiddleware, serviceController.listServices);
+// --- Public Routes (Anyone can see these) ---
 
-// Only Admins can add new services
-// Changed serviceController.addOffice to serviceController.addService
-router.post('/add', authMiddleware, roleMiddleware('Admin'), serviceController.addService);
+// 1. List all active services
+router.get('/', serviceController.listServices);
+
+// 2. Get details for one specific service
+router.get('/:id', serviceController.getServiceById);
+
+
+// --- Admin Protected Routes (Require Token + Admin Role) ---
+
+// 3. Add a new service
+router.post('/add', authMiddleware, serviceController.addService);
+
+// 4. Update an existing service
+router.put('/:id', authMiddleware, serviceController.updateService);
+
+// 5. Delete a service
+router.delete('/:id', authMiddleware, serviceController.deleteService);
 
 module.exports = router;
