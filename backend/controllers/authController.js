@@ -11,23 +11,22 @@ module.exports = {
     register: async (req, res) => {
         const t = await sequelize.transaction();
         try {
-            const { phone_number, email, username, password, role } = req.body; 
+            const { phone_number, fullname, password } = req.body; 
             
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
             const newUser = await User.create({
                 phone_number,
-                email,
-                username,
+                fullname,
+                username: fullname,
                 password: hashedPassword, 
-                role: role || 'Customer',
+                role: 'Customer',
             }, { transaction: t });
 
-     
             await Accounts.create({
                 user_id: newUser.user_id,
-                email,
+                email: null,
                 password_hash: hashedPassword
             }, { transaction: t });
 
@@ -41,42 +40,36 @@ module.exports = {
 
     login: async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { phone_number, password } = req.body;
     
-        const account = await Accounts.findOne({
-            where: { email },
-            include: [{ 
-                model: User, 
-                as: 'user_details' // Exact match for the alias
-            }]
+        const user = await User.scope('withPassword').findOne({
+            where: { phone_number }
         });
 
-       
-        if (!account || !account.user_details) {
-            return res.status(404).json({ message: "Account or User profile not found" });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
 
-        const isMatch = await bcrypt.compare(password, account.password_hash);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
         const token = jwt.sign(
-            { user_id: account.user_id, role: account.user_details.role }, 
+            { user_id: user.user_id, role: user.role }, 
             JWT_SECRET, 
             { expiresIn: '24h' }
         );
 
-        await sessionService.createSession(account.user_id, token);
+        await sessionService.createSession(user.user_id, token);
 
         return res.status(200).json({
             message: "Login Successfully!",
             token,
-            user: { user_id: account.user_id, role: account.user_details.role }
+            user: { user_id: user.user_id, role: user.role }
         });
 
     } catch (error) {
-  
         return res.status(500).json({ error: error.message });
     }
 },
@@ -97,9 +90,9 @@ module.exports = {
     },
 
 forgotPassword: async (req, res) => {
-    const { email } = req.body;
+    const { phone_number } = req.body;
     try {
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { phone_number } });
         if (!user) return res.status(404).json({ error: "User not found" });
 
         const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -109,18 +102,19 @@ forgotPassword: async (req, res) => {
         
         await user.save();
 
-        await emailService.sendVerificationCode(email, code);
-        res.json({ message: "Code sent successfully!" });
+        // TODO: Send SMS instead of email
+        // await smsService.sendVerificationCode(phone_number, code);
+        res.json({ message: "Code sent successfully!", code }); // Remove code from response in production
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 },
   verifyResetCode: async (req, res) => {
     try {
-        const { email, code } = req.body;
+        const { phone_number, code } = req.body;
         const user = await User.findOne({ 
     where: { 
-        email: email, 
+        phone_number: phone_number, 
         reset_code: code
     } 
 });
@@ -136,12 +130,12 @@ forgotPassword: async (req, res) => {
   },
 
 resetPassword: async (req, res) => {
-    const { email, code, newPassword } = req.body;
+    const { phone_number, code, newPassword } = req.body;
     const t = await sequelize.transaction(); 
 
     try {
 
-        const user = await User.findOne({ where: { email, reset_code: code } });
+        const user = await User.findOne({ where: { phone_number, reset_code: code } });
 
         if (!user || user.reset_expiry < Date.now()) {
             return res.status(400).json({ error: "Unauthorized or code expired." });

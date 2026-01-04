@@ -11,7 +11,7 @@ router.post('/login', authController.login);
 router.post('/logout', verifyToken, authController.logout);
 
 router.post('/forgot-password', forgotPassword);
-router.post('/verify-code', verifyResetCode);
+router.post('/verify-reset-code', verifyResetCode);
 router.post('/reset-password', authController.resetPassword);
 
 module.exports = router;

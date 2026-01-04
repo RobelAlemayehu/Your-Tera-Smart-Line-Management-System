@@ -11,8 +11,9 @@ const AuthPage = ({ initialMode = "signup" }) => {
     initialMode === "signin" ? "signin" : "signup"
   );
   const [formValues, setFormValues] = useState({
-    fullname: "",
-    phone_number: "",
+    fullName: "",
+    email: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -42,9 +43,10 @@ const AuthPage = ({ initialMode = "signup" }) => {
         
         // Register new user
         const response = await authService.register({
-          phone_number: formValues.phone_number,
+          email: formValues.email,
           password: formValues.password,
-          fullname: formValues.fullname
+          username: formValues.fullName,
+          phone_number: formValues.phoneNumber
         });
         
         if (response.data) {
@@ -54,7 +56,7 @@ const AuthPage = ({ initialMode = "signup" }) => {
       } else {
         // Login
         const response = await authService.login({
-          phone_number: formValues.phone_number,
+          email: formValues.email,
           password: formValues.password
         });
 
@@ -62,7 +64,7 @@ const AuthPage = ({ initialMode = "signup" }) => {
           const userData = {
             user_id: response.data.user.user_id,
             role: response.data.user.role,
-            phone_number: formValues.phone_number
+            email: formValues.email
           };
           
           login(userData, response.data.token);
@@ -115,23 +117,36 @@ const AuthPage = ({ initialMode = "signup" }) => {
               <input
                 type="text"
                 placeholder="Enter your full name"
-                value={formValues.fullname}
-                onChange={handleChange("fullname")}
+                value={formValues.fullName}
+                onChange={handleChange("fullName")}
                 required
               />
             </div>
           )}
 
           <div className="field">
-            <label>Phone Number</label>
+            <label>Email</label>
             <input
-              type="tel"
-              placeholder="Enter your phone number"
-              value={formValues.phone_number}
-              onChange={handleChange("phone_number")}
+              type="email"
+              placeholder="Email"
+              value={formValues.email}
+              onChange={handleChange("email")}
               required
             />
           </div>
+
+          {mode === "signup" && (
+            <div className="field">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                placeholder="Enter your phone number"
+                value={formValues.phoneNumber}
+                onChange={handleChange("phoneNumber")}
+                required
+              />
+            </div>
+          )}
 
           <div className="field">
             <label>Password</label>

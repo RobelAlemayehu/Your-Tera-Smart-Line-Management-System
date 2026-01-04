@@ -44,7 +44,7 @@ sequelize.authenticate()
     .then(() => {
         console.log('Database connected successfully.');
         // FIXED: Using alter: true ensures columns are renamed/added for the whole team automatically
-        return sequelize.sync({ alter: true }); 
+        return sequelize.sync({ force: false, alter: false }); 
     })
     .then(() => {
         console.log("Database synced and columns corrected for the whole team.");
