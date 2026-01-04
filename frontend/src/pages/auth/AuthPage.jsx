@@ -14,6 +14,7 @@ const AuthPage = ({ initialMode = "signup" }) => {
     fullname: "",
     phone_number: "",
     password: "",
+    confirmPassword: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +34,12 @@ const AuthPage = ({ initialMode = "signup" }) => {
 
     try {
       if (mode === "signup") {
+        // Validate password confirmation
+        if (formValues.password !== formValues.confirmPassword) {
+          setError("Passwords do not match");
+          return;
+        }
+        
         // Register new user
         const response = await authService.register({
           phone_number: formValues.phone_number,
@@ -147,6 +154,20 @@ const AuthPage = ({ initialMode = "signup" }) => {
               </p>
             )}
           </div>
+
+          {mode === "signup" && (
+            <div className="field">
+              <label>Confirm Password</label>
+              <input
+                type="password"
+                placeholder="Confirm your password"
+                value={formValues.confirmPassword}
+                onChange={handleChange("confirmPassword")}
+                required
+                minLength={8}
+              />
+            </div>
+          )}
 
           {mode === "signup" && (
             <p className="terms">
