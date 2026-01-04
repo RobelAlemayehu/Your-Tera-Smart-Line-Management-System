@@ -35,8 +35,14 @@ module.exports = {
             const { service_id } = req.params;
 
             // 1. Find all users currently in this service's queue BEFORE resetting
-            const activeTickets = await QueueTicket.findAll({ 
-                where: { service_id, status: 'Waiting' } // Standardized 'Waiting' status
+            const mongoose = require('mongoose');
+            const serviceObjectId = mongoose.Types.ObjectId.isValid(service_id) 
+                ? (typeof service_id === 'string' ? mongoose.Types.ObjectId(service_id) : service_id)
+                : service_id;
+
+            const activeTickets = await QueueTicket.find({ 
+                service_id: serviceObjectId, 
+                status: 'Waiting' 
             });
 
             // 2. Perform the actual mass deletion/reset
@@ -46,7 +52,7 @@ module.exports = {
             if (activeTickets.length > 0) {
                 await Promise.all(activeTickets.map(ticket => 
                     notificationService.createNotification(
-                        ticket.user_id, 
+                        ticket.user_id.toString(), 
                         "The service queue has been reset and your ticket was removed.", 
                         "InApp"
                     )
@@ -135,7 +141,7 @@ module.exports = {
 
     addService: async (req, res) => {
         try {
-            const service = await adminService.createService(req.body);
+            const service = await adminService.createNewService(req.body);
             res.status(201).json({ message: "Service created successfully", service });
         } catch (error) {
             res.status(400).json({ error: error.message });

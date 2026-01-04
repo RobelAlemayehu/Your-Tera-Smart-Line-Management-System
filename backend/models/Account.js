@@ -1,43 +1,31 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const Accounts = sequelize.define(
-        'Accounts',
-        {
-            account_id: {
-                type: DataTypes.INTEGER,
-                primaryKey: true,
-                autoIncrement: true,
-                allowNull: false
-            },
-            user_id: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                references: {
-                    model: 'users', 
-                    key: 'user_id'
-                }
-            },
-        
-            password_hash: {
-                type: DataTypes.STRING,
-                allowNull: false
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: true,
-                unique: true
-            }
-        },
-        {
-            tableName: 'accounts', 
-            timestamps: false 
-        }
-    );
+const mongoose = require('mongoose');
 
-    Accounts.associate = function(models) {
-        Accounts.belongsTo(models.User, { foreignKey: 'user_id', as: 'user_details' });
-    };
+const accountSchema = new mongoose.Schema({
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    password_hash: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        default: null,
+        trim: true,
+        sparse: true // Allows multiple nulls but enforces uniqueness for non-null values
+    }
+}, {
+    timestamps: { createdAt: 'created_at', updatedAt: false },
+    collection: 'Accounts'
+});
 
-    return Accounts;
-};
+// Index for faster lookups
+accountSchema.index({ user_id: 1 }, { unique: true });
+
+const Accounts = mongoose.model('Accounts', accountSchema);
+
+module.exports = Accounts;

@@ -1,28 +1,43 @@
 'use strict';
 const { Office } = require('../models');
+const mongoose = require('mongoose');
 
 module.exports = {
     getAllOffices: async () => {
-        return await Office.findAll();
+        return await Office.find();
     },
 
     getOfficeById: async (id) => {
-        return await Office.findByPk(id);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error('Invalid office ID format');
+        }
+        return await Office.findById(id);
     },
 
     createOffice: async (data) => {
-        return await Office.create(data);
+        const office = new Office(data);
+        return await office.save();
     },
 
     updateOffice: async (id, updateData) => {
-        const office = await Office.findByPk(id);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error('Invalid office ID format');
+        }
+        const office = await Office.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true, runValidators: true }
+        );
         if (!office) throw new Error('Office not found');
-        return await office.update(updateData);
+        return office;
     },
 
     deleteOffice: async (id) => {
-        const office = await Office.findByPk(id);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error('Invalid office ID format');
+        }
+        const office = await Office.findByIdAndDelete(id);
         if (!office) throw new Error('Office not found');
-        return await office.destroy();
+        return office;
     }
 };

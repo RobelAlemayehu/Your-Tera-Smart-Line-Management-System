@@ -7,13 +7,23 @@ exports.joinQueue = async (req, res) => {
     try {
         // Support both camelCase (develop) and snake_case (main) for frontend flexibility
         const serviceId = req.body.serviceId || req.body.service_id;
-        const phoneNumber = req.body.phone_number || req.body.phoneNumber;
+        let phoneNumber = req.body.phone_number || req.body.phoneNumber;
         
         // Use user_id from the verified JWT token (authMiddleware)
         const userId = req.user.user_id || req.user.id;
 
         if (!serviceId) {
             return res.status(400).json({ error: "service_id is required" });
+        }
+
+        // If phone number not provided, get it from user profile
+        if (!phoneNumber) {
+            const { User } = require('../models');
+            const user = await User.findById(userId);
+            if (!user || !user.phone_number) {
+                return res.status(400).json({ error: "Phone number is required" });
+            }
+            phoneNumber = user.phone_number;
         }
 
         const ticket = await queueService.joinQueue(userId, serviceId, phoneNumber);
@@ -41,10 +51,10 @@ exports.getMyStatus = async (req, res) => {
 
         // Map through tickets to add live position data
         const results = await Promise.all(tickets.map(async (t) => {
-            const liveData = await queueService.getLiveStatus(t.ticket_id);
+            const liveData = await queueService.getLiveStatus(t._id.toString());
             return {
-                ticket_id: t.ticket_id,
-                service_name: t.service.service_name,
+                ticket_id: t._id.toString(),
+                service_name: t.service_id?.service_name || 'Unknown',
                 ticket_number: t.ticket_number,
                 status: t.status,
                 ...liveData

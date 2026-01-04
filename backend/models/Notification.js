@@ -1,61 +1,43 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const Notification = sequelize.define(
-        'Notification',
+const mongoose = require('mongoose');
 
-        {
-            notification_id: {
-                type:DataTypes.INTEGER,
-                primaryKey:true,
-                autoIncrement:true,
-                allowNull:false
-            },
+const notificationSchema = new mongoose.Schema({
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    type: {
+        type: String,
+        enum: ['SMS', 'InApp'],
+        required: true
+    },
+    message: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    status: {
+        type: String,
+        enum: ['Sent', 'Failed', 'Pending'],
+        default: 'Pending',
+        required: true
+    },
+    created_at: {
+        type: Date,
+        default: Date.now,
+        required: true
+    }
+}, {
+    timestamps: false,
+    collection: 'Notifications'
+});
 
-            user_id:{
-                type: DataTypes.INTEGER,
-                allowNull:false,
-                references: {
-                    model: 'Users',
-                    key: 'user_id'
-                },
-                onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
-            },
-            
-            type:{
-                type: DataTypes.ENUM('SMS', 'InApp'),
-                allowNull:false
-            },
+// Index for faster lookups
+notificationSchema.index({ user_id: 1 });
+notificationSchema.index({ created_at: -1 });
 
-            message:{
-                type: DataTypes.STRING,
-                allowNull:false
-            },
+const Notification = mongoose.model('Notification', notificationSchema);
 
-
-            status: {
-                type:DataTypes.ENUM('Sent', 'Failed', 'Pending'),
-                allowNull:false,
-                defaultValue:'Pending'
-            },
-
-            created_at: {
-                type:DataTypes.DATE,
-                allowNull:false,
-                defaultValue:DataTypes.NOW
-            },
-
-        
-        },
-
-        {
-            tableName:'Notifications',
-            timestamps: false,
-            underscored:true
-        }
-
-    );
-
-    return Notification
-}
+module.exports = Notification;

@@ -3,7 +3,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { sequelize } = require('./models'); 
+const connectDB = require('./config/mongodb'); 
 const authRoutes = require('./routes/authRoutes');
 const officeRoutes = require('./routes/officeRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -41,21 +41,18 @@ setInterval(() => {
     sessionService.clearExpiredSessions();
 }, 3600000);
 
-// Database Sync and Server Start
+// Database Connection and Server Start
 const PORT = process.env.PORT || 5000;
 
-sequelize.authenticate()
+// Connect to MongoDB
+connectDB()
     .then(() => {
-        console.log('Database connected successfully.');
-        // FIXED: Using alter: true ensures columns are renamed/added for the whole team automatically
-        return sequelize.sync({ force: false, alter: false }); 
-    })
-    .then(() => {
-        console.log("Database synced and columns corrected for the whole team.");
+        console.log("✅ MongoDB connected successfully!");
         app.listen(PORT, () => {
-            console.log(` Server is running on http://localhost:${PORT}`);
+            console.log(`🚀 Server is running on http://localhost:${PORT}`);
         });
     })
     .catch(err => {
-        console.error('Unable to connect to the database:', err);
+        console.error('❌ Unable to connect to the database:', err);
+        process.exit(1);
     });

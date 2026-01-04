@@ -1,57 +1,78 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define(
-        'User',
-        {
-            user_id: {
-                type: DataTypes.INTEGER,
-                primaryKey: true,
-                autoIncrement: true,
-                allowNull: false
-            },
-            fullname: {
-                type: DataTypes.STRING,
-                allowNull: false
-            },
-            phone_number: { 
-                type: DataTypes.STRING,
-                allowNull: false,
-                unique: true
-            },
-            email: { 
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            password: {
-                type: DataTypes.STRING,
-                allowNull: false
-            },
-            username: { type: DataTypes.STRING },
-            role: {
-                type: DataTypes.ENUM('Customer', 'Admin', 'Student'),
-                defaultValue: 'Customer'
-            },
-            reset_code: { type: DataTypes.STRING(4), allowNull: true },
-            reset_expiry: { type: DataTypes.DATE, allowNull: true }
-        },
-        {
-            tableName: 'Users',
-            timestamps: false,
-            underscored: true,
-            defaultScope: {
-                attributes: { exclude: ['password'] }
-            },
-            scopes: {
-                withPassword: {
-                    attributes: { include: ['password'] }
-                }
-            }
-        }
-    );
+const mongoose = require('mongoose');
 
-    User.associate = function(models) {
-        User.hasOne(models.Accounts, { foreignKey: 'user_id', as: 'account' });
-    };
-    return User;
-};
+const userSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address']
+    },
+    fullname: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    username: {
+        type: String,
+        trim: true
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false // Don't return password by default
+    },
+    phone_number: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+        // Note: phone_number is kept for SMS notifications, not for authentication
+    },
+    role: {
+        type: String,
+        enum: ['Customer', 'Admin', 'Student'],
+        default: 'Customer',
+        required: true
+    },
+    reset_code: {
+        type: String,
+        default: null
+    },
+    reset_expiry: {
+        type: Date,
+        default: null
+    }
+}, {
+    timestamps: true,
+    collection: 'Users'
+});
+
+// Indexes for faster lookups
+// Note: email and phone_number indexes are automatically created by unique: true in schema
+
+// Virtual for account relationship
+userSchema.virtual('account', {
+    ref: 'Accounts',
+    localField: '_id',
+    foreignField: 'user_id',
+    justOne: true
+});
+
+// Virtual for tickets relationship
+userSchema.virtual('tickets', {
+    ref: 'QueueTicket',
+    localField: '_id',
+    foreignField: 'user_id'
+});
+
+// Enable virtual fields in JSON
+userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', { virtuals: true });
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

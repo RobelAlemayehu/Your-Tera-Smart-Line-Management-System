@@ -1,58 +1,36 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const Service = sequelize.define(
-        'Service',
+const mongoose = require('mongoose');
 
-        {
-            service_id:{
-                type:DataTypes.INTEGER,
-                primaryKey:true,
-                autoIncrement:true,
-                allowNull:false
-            },
+const serviceSchema = new mongoose.Schema({
+    office_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Office',
+        required: true
+    },
+    service_name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    avg_wait_time: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    is_active: {
+        type: Boolean,
+        default: true,
+        required: true
+    }
+}, {
+    timestamps: false,
+    collection: 'Services'
+});
 
-            office_id:{
-                type:DataTypes.INTEGER,
-                allowNull:false,
-                references: {
-                    model:'Offices',
-                    key: 'office_id'
-                },
-                onUpdate:'CASCADE',
-                onDelete:'CASCADE'
-            },
+// Index for faster lookups
+serviceSchema.index({ office_id: 1 });
 
-            service_name:{
-                type:DataTypes.STRING,
-                allowNull:false
-            },
+const Service = mongoose.model('Service', serviceSchema);
 
-            avg_wait_time:{
-                type:DataTypes.INTEGER,
-                allowNull:false,
-                commnet:'Average wait time in minutes'
-            },
-
-            is_active:{
-                type:DataTypes.BOOLEAN,
-                allowNull:false,
-                defaultValue:true
-            }
-        },
-        {
-            tableName: 'Services',
-            timestamps:false,
-            underscored:true
-        }
-    );
-
-    Service.association = function(models) {
-        Service.belongsTo(model.Office, {
-            foreignKey: 'office_id',
-            as: 'office'
-        });
-    };
-
-    return Service
-}
+module.exports = Service;

@@ -1,72 +1,49 @@
 'use strict';
-const { Model } = require('sequelize');
 
-module.exports = (sequelize, DataTypes) => {
-  class QueueTicket extends Model {
-    static associate(models) {
-      // Associations
-      QueueTicket.belongsTo(models.User, {
-        foreignKey: 'user_id',
-        as: 'user'
-      });
-      QueueTicket.belongsTo(models.Service, {
-        foreignKey: 'service_id',
-        as: 'service'
-      });
-    }
-  }
+const mongoose = require('mongoose');
 
-  QueueTicket.init({
-    ticket_id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false
-    },
+const queueTicketSchema = new mongoose.Schema({
     user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'user_id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     service_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Services',
-        key: 'service_id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Service',
+        required: true
     },
     ticket_number: {
-      type: DataTypes.STRING, // Kept as STRING for "ID-101" format
-      allowNull: false
+        type: String,
+        required: true,
+        trim: true
     },
-    phone_number: { 
-      type: DataTypes.STRING,
-      allowNull: false
+    phone_number: {
+        type: String,
+        required: true,
+        trim: true
     },
-    position: { 
-      type: DataTypes.INTEGER,
-      allowNull: false
+    position: {
+        type: Number,
+        required: true,
+        min: 0
     },
     status: {
-      type: DataTypes.ENUM('Waiting', 'Serving', 'Completed', 'Cancelled'),
-      defaultValue: 'Waiting',
-      allowNull: false
+        type: String,
+        enum: ['Waiting', 'Serving', 'Completed', 'Cancelled'],
+        default: 'Waiting',
+        required: true
     }
-  }, {
-    sequelize,
-    modelName: 'QueueTicket',
-    tableName: 'Queue_Tickets',
-    underscored: true, // Converts createdAt to created_at automatically
-    timestamps: true   // Using standard Sequelize timestamps for better tracking
-  });
+}, {
+    timestamps: true,
+    collection: 'Queue_Tickets'
+});
 
-  return QueueTicket;
-};
+// Indexes for faster queries
+queueTicketSchema.index({ service_id: 1, status: 1 });
+queueTicketSchema.index({ user_id: 1 });
+queueTicketSchema.index({ ticket_number: 1 }, { unique: true });
+
+const QueueTicket = mongoose.model('QueueTicket', queueTicketSchema);
+
+module.exports = QueueTicket;

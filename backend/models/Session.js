@@ -1,40 +1,33 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const Session = sequelize.define(
-        'Session',
+const mongoose = require('mongoose');
 
-        {
-            session_token: {
-                type: DataTypes.STRING,
-                primaryKey:true,
-                allowNull:false
-            },
+const sessionSchema = new mongoose.Schema({
+    session_token: {
+        type: String,
+        required: true,
+        unique: true,
+        primaryKey: true
+    },
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    expiry: {
+        type: Date,
+        required: true
+    }
+}, {
+    timestamps: false,
+    collection: 'Sessions'
+});
 
-            user_id: {
-                type:DataTypes.INTEGER,
-                allowNull:false,
-                references: {
-                    model:'Users',
-                    key: 'user_id'
-                },
-                onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
-            },
+// Index for faster lookups
+// Note: session_token index is automatically created by unique: true in schema
+sessionSchema.index({ user_id: 1 });
+sessionSchema.index({ expiry: 1 }); // For TTL cleanup
 
-            expiry: {
-                type: DataTypes.DATE,
-                allowNull:false
-            }
-        },
+const Session = mongoose.model('Session', sessionSchema);
 
-
-        {
-            tableName: 'Sessions',
-            timestamps:false,
-            underscored:true
-        }
-    );
-
-    return Session
-}
+module.exports = Session;

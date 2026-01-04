@@ -1,31 +1,24 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const Office = sequelize.define(
-        'Office',
-        {
-            office_id :{
-                type: DataTypes.INTEGER,
-                primaryKey:true,
-                autoIncrement:true,
-                allowNull:false
-            },
-            office_name: {
-                type:DataTypes.STRING,
-                allowNull:false,
-                unique:true
-            },
-            location:{
-                type:DataTypes.STRING,
-                allowNull:false
-            }
-        },
-        {
-            tableName:'Offices',
-            timestamps:false,
-            underscored:true
-        }
-    );
+const mongoose = require('mongoose');
 
-    return Office
-}
+const officeSchema = new mongoose.Schema({
+    office_name: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+    location: {
+        type: String,
+        required: true,
+        trim: true
+    }
+}, {
+    timestamps: false,
+    collection: 'Offices'
+});
+
+const Office = mongoose.model('Office', officeSchema);
+
+module.exports = Office;

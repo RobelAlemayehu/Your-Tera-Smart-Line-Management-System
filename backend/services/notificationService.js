@@ -1,6 +1,7 @@
 'use strict';
 const axios = require('axios');
 const { Notification } = require('../models');
+const mongoose = require('mongoose');
 
 /**
  * Combined Notification Service: 
@@ -17,24 +18,27 @@ class NotificationService {
      * The Master Function: Logs to DB and then sends SMS
      */
     async notifyUser(user_id, phoneNumber, message, type = 'SMS') {
-        // 1. Create record in Database first (from main)
-        const dbNotification = await Notification.create({
-            user_id: user_id,
+        // Convert user_id to ObjectId if needed
+        const userObjectId = mongoose.Types.ObjectId.isValid(user_id) 
+            ? (typeof user_id === 'string' ? mongoose.Types.ObjectId(user_id) : user_id)
+            : user_id;
+
+        // 1. Create record in Database first
+        const dbNotification = new Notification({
+            user_id: userObjectId,
             message: message,
             type: type, 
             status: 'Pending', 
             created_at: new Date() 
         });
+        await dbNotification.save();
 
-        // 2. Try to send the actual SMS (from develop)
+        // 2. Try to send the actual SMS
         const smsSuccess = await this.sendTicketSMS(phoneNumber, message);
 
         // 3. Update DB status based on SMS result
-        if (smsSuccess) {
-            await dbNotification.update({ status: 'Sent' });
-        } else {
-            await dbNotification.update({ status: 'Failed' });
-        }
+        dbNotification.status = smsSuccess ? 'Sent' : 'Failed';
+        await dbNotification.save();
 
         return dbNotification;
     }
@@ -63,20 +67,40 @@ class NotificationService {
     }
 
     /**
-     * Fetching for Frontend (from main)
+     * Fetching for Frontend
      */
     async getUserNotifications(user_id) {
-        return await Notification.findAll({
-            where: { user_id },
-            order: [['created_at', 'DESC']]
-        });
+        const userObjectId = mongoose.Types.ObjectId.isValid(user_id) 
+            ? (typeof user_id === 'string' ? mongoose.Types.ObjectId(user_id) : user_id)
+            : user_id;
+
+        return await Notification.find({ user_id: userObjectId })
+            .sort({ created_at: -1 });
     }
 
     async markAsRead(notification_id) {
-        return await Notification.update(
+        if (!mongoose.Types.ObjectId.isValid(notification_id)) {
+            throw new Error('Invalid notification ID format');
+        }
+        return await Notification.findByIdAndUpdate(
+            notification_id,
             { status: 'Read' },
-            { where: { notification_id } }
+            { new: true }
         );
+    }
+
+    async createNotification(user_id, message, type = 'InApp') {
+        const userObjectId = mongoose.Types.ObjectId.isValid(user_id) 
+            ? (typeof user_id === 'string' ? mongoose.Types.ObjectId(user_id) : user_id)
+            : user_id;
+
+        const notification = new Notification({
+            user_id: userObjectId,
+            message,
+            type,
+            status: 'Pending'
+        });
+        return await notification.save();
     }
 }
 

@@ -1,7 +1,7 @@
 'use strict';
 
 require('dotenv').config();
-const { User, Accounts, sequelize } = require('../models');
+const { User, Accounts } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sessionService = require('../services/sessionService');
@@ -18,62 +18,115 @@ if (JWT_SECRET === "my_temporary_secret_key_123") {
 module.exports = {
     // 1. REGISTER: Creates User and linked Account
     register: async (req, res) => {
-        const t = await sequelize.transaction();
+        const session = await User.db.startSession();
+        session.startTransaction();
         try {
-            const { phone_number, fullname, password } = req.body; 
+            const { email, fullname, password, confirm_password, phone_number } = req.body;
             
+            // Validation
+            if (!email || !fullname || !password || !confirm_password || !phone_number) {
+                await session.abortTransaction();
+                return res.status(400).json({ error: "All fields are required: email, fullname, password, confirm_password, phone_number" });
+            }
+
+            // Check if passwords match
+            if (password !== confirm_password) {
+                await session.abortTransaction();
+                return res.status(400).json({ error: "Passwords do not match" });
+            }
+
+            // Check if email already exists
+            const existingUser = await User.findOne({ email: email.toLowerCase() }).session(session);
+            if (existingUser) {
+                await session.abortTransaction();
+                return res.status(400).json({ error: "Email already registered" });
+            }
+
+            // Hash password
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            const newUser = await User.create({
-                phone_number,
+            // Create user
+            const newUser = new User({
+                email: email.toLowerCase(),
                 fullname,
                 username: fullname,
-                password: hashedPassword, 
-                role: 'Customer',
-            }, { transaction: t });
+                password: hashedPassword,
+                phone_number,
+                role: 'Customer'
+            });
+            await newUser.save({ session });
 
-            await Accounts.create({
-                user_id: newUser.user_id,
-                email: null,
+            // Create account
+            const newAccount = new Accounts({
+                user_id: newUser._id,
+                email: email.toLowerCase(),
                 password_hash: hashedPassword
-            }, { transaction: t });
+            });
+            await newAccount.save({ session });
 
-            await t.commit();
-            res.status(201).json({ message: "User and Account created successfully!" });
+            await session.commitTransaction();
+            res.status(201).json({ 
+                message: "User registered successfully!",
+                user: {
+                    email: newUser.email,
+                    fullname: newUser.fullname,
+                    phone_number: newUser.phone_number
+                }
+            });
         } catch (error) {
-            await t.rollback();
+            await session.abortTransaction();
+            if (error.code === 11000) {
+                // Duplicate key error
+                const field = Object.keys(error.keyPattern)[0];
+                return res.status(400).json({ error: `${field} already exists` });
+            }
             res.status(500).json({ error: error.message });
+        } finally {
+            session.endSession();
         }
     },
 
-    // 2. LOGIN: Verifies, Signs JWT, and Creates Session
+    // 2. LOGIN: Verifies email/password, Signs JWT, and Creates Session
     login: async (req, res) => {
         try {
-            const { phone_number, password } = req.body;
+            const { email, password } = req.body;
+            
+            if (!email || !password) {
+                return res.status(400).json({ message: "Email and password are required" });
+            }
         
-            const user = await User.scope('withPassword').findOne({
-                where: { phone_number }
-            });
+            // Use select('+password') to include password field
+            const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
-            if (!user) return res.status(404).json({ message: "User not found" });
+            if (!user) {
+                return res.status(404).json({ message: "Invalid email or password" });
+            }
 
             const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+            if (!isMatch) {
+                return res.status(401).json({ message: "Invalid email or password" });
+            }
 
             const token = jwt.sign(
-                { user_id: user.user_id, role: user.role }, 
+                { user_id: user._id.toString(), role: user.role }, 
                 JWT_SECRET, 
                 { expiresIn: '24h' }
             );
 
-            // Record session in DB (from main)
-            await sessionService.createSession(user.user_id, token);
+            // Record session in DB
+            await sessionService.createSession(user._id.toString(), token);
 
             return res.status(200).json({
                 message: "Login Successfully!",
                 token,
-                user: { user_id: user.user_id, role: user.role }
+                user: { 
+                    user_id: user._id.toString(), 
+                    email: user.email,
+                    fullname: user.fullname,
+                    phone_number: user.phone_number,
+                    role: user.role 
+                }
             });
         } catch (error) {
             return res.status(500).json({ error: error.message });
@@ -95,20 +148,33 @@ module.exports = {
         }
     },
 
-    // 4. FORGOT PASSWORD: Generates a 4-digit SMS code
+    // 4. FORGOT PASSWORD: Sends reset code to email
     forgotPassword: async (req, res) => {
-        const { phone_number } = req.body;
+        const { email } = req.body;
         try {
-            const user = await User.findOne({ where: { phone_number } });
-            if (!user) return res.status(404).json({ error: "User not found" });
+            if (!email) {
+                return res.status(400).json({ error: "Email is required" });
+            }
+
+            const user = await User.findOne({ email: email.toLowerCase() });
+            if (!user) {
+                // Don't reveal if email exists for security
+                return res.status(200).json({ 
+                    message: "If the email exists, a reset code will be sent." 
+                });
+            }
 
             const code = Math.floor(1000 + Math.random() * 9000).toString();
             user.reset_code = code; 
             user.reset_expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
             await user.save();
 
-            // Note: In production, send this via Traccar/SMS service
-            res.json({ message: "Reset code generated!", code }); 
+            // TODO: In production, send code via email service
+            // For now, return code in response (remove in production!)
+            res.json({ 
+                message: "Reset code generated! Check your email.",
+                code // Remove this in production - only for testing
+            }); 
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -117,32 +183,45 @@ module.exports = {
     // 5. VERIFY RESET CODE: Validates the reset code
     verifyResetCode: async (req, res) => {
         try {
-            const { phone_number, code } = req.body;
-            const user = await User.findOne({ 
-                where: { 
-                    phone_number: phone_number, 
-                    reset_code: code
-                } 
-            });
-
-            if (!user || user.reset_expiry < Date.now()) {
-                throw new Error("Invalid or expired code.");
+            const { email, code } = req.body;
+            
+            if (!email || !code) {
+                return res.status(400).json({ error: "Email and code are required" });
             }
 
-            res.status(200).json({ message: "Code verified. You may now reset your password." });
+            const user = await User.findOne({ 
+                email: email.toLowerCase(), 
+                reset_code: code
+            });
+
+            if (!user || user.reset_expiry < new Date()) {
+                return res.status(400).json({ error: "Invalid or expired code." });
+            }
+
+            res.status(200).json({ message: "Reset code verified successfully." });
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     },
 
-    // 6. RESET PASSWORD: Updates password across User and Accounts tables
+    // 6. RESET PASSWORD: Updates password using email and code
     resetPassword: async (req, res) => {
-        const { phone_number, code, newPassword } = req.body;
-        const t = await sequelize.transaction(); 
-        try {
-            const user = await User.findOne({ where: { phone_number, reset_code: code } });
+        const { email, code, newPassword } = req.body;
+        
+        if (!email || !code || !newPassword) {
+            return res.status(400).json({ error: "Email, code, and newPassword are required" });
+        }
 
-            if (!user || user.reset_expiry < Date.now()) {
+        const session = await User.db.startSession();
+        session.startTransaction();
+        try {
+            const user = await User.findOne({ 
+                email: email.toLowerCase(), 
+                reset_code: code 
+            }).session(session);
+
+            if (!user || user.reset_expiry < new Date()) {
+                await session.abortTransaction();
                 return res.status(400).json({ error: "Unauthorized or code expired." });
             }
 
@@ -152,19 +231,22 @@ module.exports = {
             user.password = hashed;
             user.reset_code = null;
             user.reset_expiry = null;
-            await user.save({ transaction: t });
+            await user.save({ session });
 
-            // Sync the password in the Accounts table (from main)
-            await Accounts.update(
-                { password_hash: hashed }, 
-                { where: { user_id: user.user_id }, transaction: t }
+            // Sync the password in the Accounts table
+            await Accounts.updateOne(
+                { user_id: user._id }, 
+                { password_hash: hashed },
+                { session }
             );
 
-            await t.commit();
+            await session.commitTransaction();
             res.json({ message: "Password has been reset successfully." });
         } catch (error) {
-            if (t) await t.rollback();
+            await session.abortTransaction();
             res.status(500).json({ error: error.message });
+        } finally {
+            session.endSession();
         }
     }
 };
