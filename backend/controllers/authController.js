@@ -26,20 +26,20 @@ module.exports = {
             // Validation
             if (!email || !fullname || !password || !confirm_password || !phone_number) {
                 await session.abortTransaction();
-                return res.status(400).json({ error: "All fields are required: email, fullname, password, confirm_password, phone_number" });
+                return res.status(400).json({ error: "⚠️ Please fill in all required fields to create your account." });
             }
 
             // Check if passwords match
             if (password !== confirm_password) {
                 await session.abortTransaction();
-                return res.status(400).json({ error: "Passwords do not match" });
+                return res.status(400).json({ error: "🔒 Passwords don't match. Please make sure both passwords are identical." });
             }
 
             // Check if email already exists
             const existingUser = await User.findOne({ email: email.toLowerCase() }).session(session);
             if (existingUser) {
                 await session.abortTransaction();
-                return res.status(400).json({ error: "Email already registered" });
+                return res.status(400).json({ error: "📧 This email is already registered. Please use a different email or try signing in." });
             }
 
             // Hash password
@@ -67,7 +67,7 @@ module.exports = {
 
             await session.commitTransaction();
             res.status(201).json({ 
-                message: "User registered successfully!",
+                message: "🎉 Welcome to Your Tera! Your account has been created successfully.",
                 user: {
                     email: newUser.email,
                     fullname: newUser.fullname,
@@ -93,19 +93,19 @@ module.exports = {
             const { email, password } = req.body;
             
             if (!email || !password) {
-                return res.status(400).json({ message: "Email and password are required" });
+                return res.status(400).json({ message: "⚠️ Please enter both your email and password to sign in." });
             }
         
             // Use select('+password') to include password field
             const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
             if (!user) {
-                return res.status(404).json({ message: "Invalid email or password" });
+                return res.status(404).json({ message: "🚫 Invalid email or password. Please check your credentials and try again." });
             }
 
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return res.status(401).json({ message: "Invalid email or password" });
+                return res.status(401).json({ message: "🚫 Invalid email or password. Please check your credentials and try again." });
             }
 
             const token = jwt.sign(
