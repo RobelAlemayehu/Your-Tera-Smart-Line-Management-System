@@ -5,7 +5,7 @@ import Rectangle34 from '../../assets/images/Rectangle34.png';
 import '../../styles/auth.css';
 
 function ForgetPassword(){
-    const [emailOrPhone, setEmailOrPhone] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -20,8 +20,8 @@ function ForgetPassword(){
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!emailOrPhone) {
-            alert("Please enter your email or phone number");
+        if (!phoneNumber) {
+            alert("Please enter your phone number");
             return;
         }
 
@@ -29,23 +29,19 @@ function ForgetPassword(){
 
         try {
             const response = await axios.post(
-                "", // backend endpoint for forgot password
-                { contact: emailOrPhone },
+                "http://localhost:3000/api/auth/forgot-password",
+                { phone_number: phoneNumber },
                 { headers: { "Content-Type": "application/json" } }
             );
 
             const data = response.data;
-            if (data.token) {
-                localStorage.setItem("token", data.token);
-            }
-
             setLoading(false);
-            navigate("/verify", { state: { email: emailOrPhone } });
+            navigate("/verify", { state: { phone_number: phoneNumber } });
             
         } catch (error) {
             setLoading(false);
             if (error.response) {
-                alert(error.response.data.message || "Failed to send code");
+                alert(error.response.data.error || "Failed to send code");
             } else {
                 alert("Server not responding");
             }
@@ -58,14 +54,14 @@ function ForgetPassword(){
 
             <div className="card-2">
                 <h1>Forgot Password</h1>
-                <p>Enter your email or phone number and we'll send you a confirmation code to reset your password.</p>
+                <p>Enter your phone number and we'll send you a confirmation code to reset your password.</p>
 
                 <form className="form-1" onSubmit={handleSubmit}>
                     <input 
-                        type="text"  
-                        placeholder="Email or Phone Number"  
-                        value={emailOrPhone}
-                        onChange={(e) => setEmailOrPhone(e.target.value)}
+                        type="tel"  
+                        placeholder="Phone Number"  
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                         required
                     />
                     

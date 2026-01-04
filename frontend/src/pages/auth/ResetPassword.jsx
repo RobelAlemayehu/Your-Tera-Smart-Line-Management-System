@@ -13,7 +13,8 @@ function ResetPassword() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
+  const phone_number = location.state?.phone_number;
+  const code = location.state?.code;
 
   useEffect(() => {
     document.body.classList.add("auth-page");
@@ -39,23 +40,23 @@ function ResetPassword() {
 
     try {
       const response = await axios.post(
-        "", // backend reset password endpoint
-        { email, password: newPassword },
+        "http://localhost:3000/api/auth/reset-password",
+        { phone_number, code, newPassword },
         { headers: { "Content-Type": "application/json" } }
       );
 
       const data = response.data;
       setLoading(false);
 
-      if (data.success) {
+      if (response.status === 200) {
         navigate("/success");
       } else {
-        alert(data.message || "Failed to reset password");
+        alert(data.error || "Failed to reset password");
       }
     } catch (error) {
       setLoading(false);
       if (error.response) {
-        alert(error.response.data.message || "Server error");
+        alert(error.response.data.error || "Server error");
       } else {
         alert("Server not responding");
       }

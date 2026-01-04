@@ -7,7 +7,7 @@ import '../../styles/auth.css';
 
 function Verify(){  
     const location = useLocation();
-    const email = location.state?.email; //get email from navigation state
+    const phone_number = location.state?.phone_number;
 
       const [code, setCode] = useState(["", "", "", ""]);
       const [loading, setLoading] = useState(false);
@@ -43,8 +43,8 @@ function Verify(){
 
         try {
         const response = await axios.post(
-            "", // backend verify OTP endpoint
-            { email, code: otp },
+            "http://localhost:3000/api/auth/verify-reset-code",
+            { phone_number, code: otp },
             { headers: { "Content-Type": "application/json" } }
         );
 
@@ -52,16 +52,16 @@ function Verify(){
 
         setLoading(false);
 
-        if (data.success) {
-            navigate("/reset-password", { state: { email: email } });  // go to reset password page and transfer email
+        if (response.status === 200) {
+            navigate("/reset-password", { state: { phone_number: phone_number, code: otp } });
         } else {
-            alert(data.message || "Invalid code");
+            alert(data.error || "Invalid code");
         }
 
         } catch (error) {
         setLoading(false);
         if (error.response) {
-            alert(error.response.data.message || "Failed to verify code");
+            alert(error.response.data.error || "Failed to verify code");
         } else {
             alert("Server not responding");
         }
@@ -76,7 +76,7 @@ function Verify(){
     
         <div className="card-2">
             <h1>Forgot Password</h1>
-            <p>Reset code sent. Check your email or SMS</p>
+            <p>Reset code sent. Check your SMS</p>
 
           <form className="form-1"   onSubmit={handleSubmit}>
              <div className="code-inputs">
