@@ -1,35 +1,38 @@
-import { useState } from "react";
+import { useState } from "react"
 
-const clients = [
+const testimonials = [
   {
-    id: "gov",
-    title: "Government Service Officer",
+    id: 1,
+    role: "Government Service Officer",
     location: "Addis Ababa, Ethiopia",
     quote: "Before using this system, our queues were chaotic. Now everything is organized, digital, and transparent",
-    author: "Henok T., Revenue Officer",
-    avatar: "/images/testimonal1.png",
+    author: "Henok T.",
+    authorRole: "Revenue Officer",
+    avatar: "/images/avatar1.png",
   },
   {
-    id: "telecom",
-    title: "Telecom Customer Support Agent",
+    id: 2,
+    role: "Telecom Customer Support Agent",
     location: "Hawassa, Ethiopia",
-    quote: "The real-time notifications have transformed how we handle peak hours. Our customers are much happier now.",
-    author: "Sara M., Support Agent",
-    avatar: "/images/testimonal2.png",
+    quote: "The real-time tracking has significantly reduced customer frustration. They know exactly when their turn is coming.",
+    author: "Sara M.",
+    authorRole: "Support Lead",
+    avatar: "/images/avatar2.png",
   },
   {
-    id: "student",
-    title: "AAU Student",
+    id: 3,
+    role: "AAU Student",
     location: "Addis Ababa, Ethiopia",
-    quote: "I can now check my position in the queue from my phone. No more wasting hours standing in line.",
-    author: "Abebe K., Student",
-    avatar: "/images/testimonal2.png",
+    quote: "I can join the queue from my dorm and only head to the office when I'm 5 people away. It's a lifesaver!",
+    author: "Dawit K.",
+    authorRole: "Student",
+    avatar: "/images/avatar3.png",
   },
-];
+]
 
-const Testimonials = () => {
-  const [activeTab, setActiveTab] = useState("gov");
-  const activeClient = clients.find((c) => c.id === activeTab);
+export default function Testimonials() {
+  const [activeId, setActiveId] = useState(1)
+  const activeTestimonial = testimonials.find((t) => t.id === activeId) || testimonials[0]
 
   return (
     <section className="testimonials">
@@ -38,36 +41,36 @@ const Testimonials = () => {
 
         <div className="testimonials-content">
           <div className="testimonials-tabs">
-            {clients.map((client) => (
+            {testimonials.map((t) => (
               <button
-                key={client.id}
-                onClick={() => setActiveTab(client.id)}
-                className={`testimonial-tab ${activeTab === client.id ? 'active' : ''}`}
+                key={t.id}
+                onClick={() => setActiveId(t.id)}
+                className={`testimonial-tab ${activeId === t.id ? 'active' : ''}`}
               >
-                <h4>{client.title}</h4>
-                <p className="tab-location">{client.location}</p>
+                <h4>{t.role}</h4>
+                <div className="tab-location">{t.location}</div>
               </button>
             ))}
           </div>
 
           <div className="testimonial-display">
             <div className="testimonial-quote">
-              <p className="quote-text">"{activeClient.quote}"</p>
+              <p className="quote-text">"{activeTestimonial.quote}"</p>
               <div className="quote-author">
                 <div className="author-avatar">
                   <img
-                    src={activeClient.avatar || "/placeholder.svg"}
-                    alt={activeClient.author}
+                    src={activeTestimonial.avatar}
+                    alt={activeTestimonial.author}
                   />
                 </div>
-                <p className="author-name">{activeClient.author}</p>
+                <div className="author-name">
+                  {activeTestimonial.author}, {activeTestimonial.authorRole}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-  );
-};
-
-export default Testimonials;
+  )
+}
