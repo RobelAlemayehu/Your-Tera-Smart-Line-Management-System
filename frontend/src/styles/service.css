@@ -6,28 +6,31 @@
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
-body {
-    background-color: #ffffff;
-    color: #222;
-}
-
 /* ================= CONTENT ================= */
 .container {
     max-width: 1400px;
-    margin: 70px 15px 0;
+    margin: 70px auto 0;
     padding: 0 80px;
+    background-color: #ffffff;
 }
 
 .container h1 {
-    font-size: 24px;
-    font-weight: 100;
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
     margin-bottom: 30px;
+    color: #333 !important;
+    text-align: center;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .container p {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 90px;
+    font-size: 1.1rem !important;
+    color: #666 !important;
+    margin-bottom: 60px;
+    text-align: center;
+    display: block !important;
+    visibility: visible !important;
 }
 
 
@@ -36,39 +39,85 @@ body {
 .cards {
     display: flex;
     gap: 60px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .card {
     width: 400px;
     height: 180px;
-    background: #3E818B;
+    background: #3E818B !important;
     border-radius: 10px;
-    padding: 16px;
-    color: #fff;
-    display: flex;
+    padding: 24px;
+    color: #fff !important;
+    display: flex !important;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 100px;
+    margin-bottom: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(62, 129, 139, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.card * {
+    color: #ffffff !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(62, 129, 139, 0.4);
 }
 
 .card h3 {
-    font-size: 26px;
-    font-weight: 600;
-    margin-top: 80px;
-    margin-bottom: 8px;
-    
+    font-size: 1.8rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 12px !important;
+    color: #ffffff !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .card p {
-    font-size: 13px;
-    opacity: 0.9;
-    color: #ffffff;
-    margin-left: 4px;
+    font-size: 1rem !important;
+    opacity: 0.95 !important;
+    color: #ffffff !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1000px) {
+    .container {
+        padding: 0 40px;
+    }
+    
     .cards {
         flex-direction: column;
+        align-items: center;
+    }
+    
+    .card {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 0 20px;
+    }
+    
+    .container h1 {
+        font-size: 2rem;
+    }
+    
+    .container p {
+        font-size: 1rem;
     }
 }

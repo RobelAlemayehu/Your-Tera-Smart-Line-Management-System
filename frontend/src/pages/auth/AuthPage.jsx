@@ -37,7 +37,7 @@ const AuthPage = ({ initialMode = "signup" }) => {
       if (mode === "signup") {
         // Validate password confirmation
         if (formValues.password !== formValues.confirmPassword) {
-          setError("Passwords do not match");
+          setError("🔒 Passwords don't match. Please make sure both passwords are identical.");
           return;
         }
         
@@ -45,12 +45,13 @@ const AuthPage = ({ initialMode = "signup" }) => {
         const response = await authService.register({
           email: formValues.email,
           password: formValues.password,
-          username: formValues.fullName,
+          confirm_password: formValues.confirmPassword,
+          fullname: formValues.fullName,
           phone_number: formValues.phoneNumber
         });
         
         if (response.data) {
-          alert("Registration successful! Please sign in.");
+          alert("🎉 Welcome! Your account has been created successfully. Please sign in to continue.");
           navigate("/signin");
         }
       } else {
@@ -64,6 +65,7 @@ const AuthPage = ({ initialMode = "signup" }) => {
           const userData = {
             user_id: response.data.user.user_id,
             role: response.data.user.role,
+            fullname: response.data.user.fullname,
             email: formValues.email
           };
           
@@ -78,7 +80,8 @@ const AuthPage = ({ initialMode = "signup" }) => {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "An error occurred. Please try again.");
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Something went wrong. Please try again.";
+      setError(errorMessage);
       console.error("Auth error:", err);
     } finally {
       setSubmitting(false);
