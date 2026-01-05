@@ -217,7 +217,12 @@ const AdminDashboard = () => {
       <header style={{
         backgroundColor: 'white',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        padding: '1rem 0'
+        padding: '1rem 0',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000
       }}>
         <div style={{
           maxWidth: '1400px',
@@ -266,14 +271,24 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1.5rem', paddingTop: '180px' }}>
         {/* Navigation Tabs */}
         <div style={{
           display: 'flex',
           gap: '1rem',
           marginBottom: '2rem',
           borderBottom: '2px solid #e5e7eb',
-          overflowX: 'auto'
+          overflowX: 'auto',
+          position: 'fixed',
+          top: '90px',
+          left: 0,
+          right: 0,
+          backgroundColor: 'white',
+          zIndex: 999,
+          padding: '1rem 1.5rem',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          maxWidth: '1400px',
+          margin: '0 auto'
         }}>
           {[
             { key: 'overview', label: 'Overview', icon: BarChart3 },
@@ -769,16 +784,10 @@ const AdminDashboard = () => {
                       <select
                         value={user.role}
                         onChange={(e) => handleChangeUserRole(user._id, e.target.value)}
-                        style={{
-                          padding: '8px 12px',
-                          border: '2px solid #e1e5e9',
-                          borderRadius: '6px',
-                          fontSize: '14px'
-                        }}
+                        className="user-role-select"
                       >
                         <option value="Customer">Customer</option>
                         <option value="Admin">Admin</option>
-                        <option value="Student">Student</option>
                       </select>
                     </div>
                   </div>
