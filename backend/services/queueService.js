@@ -36,9 +36,10 @@ class QueueService {
         });
         const nextPosition = peopleAhead + 1;
 
-        // Generate Ticket Number (Prefix-100+Pos)
+        // Generate Dynamic Ticket Number (Prefix + Timestamp)
         const prefix = service.service_name ? service.service_name.substring(0, 2).toUpperCase() : 'TK';
-        const ticketNumber = `${prefix}-${100 + nextPosition}`;
+        const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+        const ticketNumber = `${prefix}-${timestamp}`;
         const estimatedWaitTime = peopleAhead * (service.avg_wait_time || 15);
 
         // Create Ticket

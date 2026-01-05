@@ -10,8 +10,8 @@ export default function LandingPage() {
     <main style={{ backgroundColor: 'white', width: '100vw', margin: 0, padding: 0 }}>
       <Navbar />
       <Hero />
-      <FeatureCards />
       <ServicesHeader />
+      <FeatureCards />
       <Testimonials />
       <Footer />
     </main>
