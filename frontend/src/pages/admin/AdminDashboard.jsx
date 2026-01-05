@@ -13,6 +13,8 @@ const AdminDashboard = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   // New office form
   const [newOffice, setNewOffice] = useState({
@@ -180,6 +182,14 @@ const AdminDashboard = () => {
       setMessage(error.response?.data?.error || 'Failed to update user role');
     }
   };
+
+  // Filter tickets based on date and status
+  const filteredTickets = tickets.filter(ticket => {
+    const ticketDate = new Date(ticket.createdAt).toISOString().split('T')[0];
+    const matchesDate = !dateFilter || ticketDate === dateFilter;
+    const matchesStatus = !statusFilter || ticket.status === statusFilter;
+    return matchesDate && matchesStatus;
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -385,7 +395,44 @@ const AdminDashboard = () => {
           <div>
             <h2 style={{ color: '#4A868C', marginBottom: '1.5rem' }}>Queue Management</h2>
             
-            {tickets.length === 0 ? (
+            {/* Filters */}
+            <div className="filter-container">
+              <div className="filter-row">
+                <div className="filter-group">
+                  <label className="filter-label">Filter by Date</label>
+                  <input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="filter-date-input"
+                    placeholder="Select date"
+                  />
+                </div>
+                <div className="filter-group">
+                  <label className="filter-label">Filter by Status</label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="Waiting">Waiting</option>
+                    <option value="Serving">Serving</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <button
+                  onClick={() => { setDateFilter(''); setStatusFilter(''); }}
+                  className="clear-filters-btn"
+                  title="Clear all filters"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+            
+            {filteredTickets.length === 0 ? (
               <div style={{
                 backgroundColor: 'white',
                 borderRadius: '12px',
@@ -398,7 +445,7 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '1rem' }}>
-                {tickets.map(ticket => (
+                {filteredTickets.map(ticket => (
                   <div
                     key={ticket._id}
                     style={{
