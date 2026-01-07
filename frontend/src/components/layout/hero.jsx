@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <section className="hero">
@@ -28,9 +30,11 @@ const Hero = () => {
             <span>Smart Notifications</span>
           </div> */}
         {/* </div> */}
-        <button className="hero-btn" onClick={() => navigate('/signup')}>
+        {!isAuthenticated && (
+          <button className="hero-btn" onClick={() => navigate('/signup')}>
             Get Started
           </button>
+        )}
       </div>
 
       <div className="hero-image">
