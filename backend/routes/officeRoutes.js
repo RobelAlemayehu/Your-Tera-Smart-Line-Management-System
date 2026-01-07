@@ -12,7 +12,7 @@ const { verifyToken } = require('../middlewares/authMiddleware');
 // --- Admin Only Routes ---
 // Only Admins can add, update, or delete
 
-router.get('/', verifyToken, officeController.getOffices);
+router.get('/', officeController.getOffices);
 
 
 
