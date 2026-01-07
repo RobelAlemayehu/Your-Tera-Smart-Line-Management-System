@@ -222,7 +222,6 @@ class QueueService {
     async getMyTicketsWithDetails(userId) {
         let userObjectId = userId;
         
-        // Safely convert to ObjectId if string and valid
         if (typeof userId === 'string' && mongoose.Types.ObjectId.isValid(userId)) {
             userObjectId = new mongoose.Types.ObjectId(userId);
         }
@@ -230,6 +229,37 @@ class QueueService {
         return await QueueTicket.find({
             user_id: userObjectId
         })
+        .populate({
+            path: 'service_id',
+            select: 'service_name office_id',
+            populate: {
+                path: 'office_id',
+                select: 'office_name location'
+            }
+        })
+        .sort({ createdAt: -1 });
+    }
+
+    // Get My Completed Tickets with Date Filter
+    async getMyCompletedTickets(userId, startDate, endDate) {
+        let userObjectId = userId;
+        
+        if (typeof userId === 'string' && mongoose.Types.ObjectId.isValid(userId)) {
+            userObjectId = new mongoose.Types.ObjectId(userId);
+        }
+
+        const query = {
+            user_id: userObjectId,
+            status: { $in: ['Completed', 'Cancelled'] }
+        };
+
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) query.createdAt.$gte = new Date(startDate);
+            if (endDate) query.createdAt.$lte = new Date(endDate);
+        }
+
+        return await QueueTicket.find(query)
         .populate({
             path: 'service_id',
             select: 'service_name office_id',

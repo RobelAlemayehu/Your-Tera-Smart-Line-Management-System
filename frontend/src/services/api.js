@@ -44,6 +44,12 @@ export const queueAPI = {
   joinQueue: (data) => api.post('/queue/join', data),
   getOfficeQueue: (serviceId) => api.get(`/queue/office/${serviceId}`),
   getMyStatus: () => api.get('/queue/my-status'),
+  getMyHistory: (startDate, endDate) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    return api.get(`/queue/my-history?${params.toString()}`);
+  },
   cancelTicket: (ticketId) => api.patch(`/queue/cancel/${ticketId}`),
   updateStatus: (ticketId, data) => api.patch(`/queue/status/${ticketId}`, data),
 };

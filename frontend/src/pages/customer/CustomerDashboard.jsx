@@ -12,6 +12,9 @@ const CustomerDashboard = () => {
   const [selectedOffice, setSelectedOffice] = useState('');
   const [selectedService, setSelectedService] = useState('');
   const [myTickets, setMyTickets] = useState([]);
+  const [ticketHistory, setTicketHistory] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [showTicketModal, setShowTicketModal] = useState(false);
@@ -21,6 +24,12 @@ const CustomerDashboard = () => {
     fetchOffices();
     fetchMyStatus();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      fetchTicketHistory();
+    }
+  }, [activeTab, startDate, endDate]);
 
   useEffect(() => {
     if (selectedOffice) {
@@ -56,6 +65,21 @@ const CustomerDashboard = () => {
     } catch (error) {
       console.error('Error fetching status:', error);
       setMyTickets([]); // Set empty array on error to show proper empty state
+    }
+  };
+
+  const fetchTicketHistory = async () => {
+    try {
+      console.log('Fetching ticket history...');
+      const response = await queueAPI.getMyHistory(startDate, endDate);
+      console.log('History API response:', response.data);
+      // Handle response the same way as fetchMyStatus
+      const tickets = Array.isArray(response.data) ? response.data : (response.data.tickets || []);
+      console.log('Processed tickets:', tickets);
+      setTicketHistory(tickets);
+    } catch (error) {
+      console.error('Error fetching ticket history:', error);
+      setTicketHistory([]);
     }
   };
 
@@ -187,6 +211,20 @@ const CustomerDashboard = () => {
             }}
           >
             My Tickets
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            style={{
+              padding: '12px 24px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              color: activeTab === 'history' ? '#4A868C' : '#666',
+              borderBottom: activeTab === 'history' ? '2px solid #4A868C' : 'none',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Ticket History
           </button>
         </div>
 
@@ -394,6 +432,166 @@ const CustomerDashboard = () => {
                         Cancel Ticket
                       </button>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Ticket History Tab */}
+        {activeTab === 'history' && (
+          <div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1.5rem'
+            }}>
+              <h2 style={{ color: '#4A868C', margin: 0 }}>Ticket History</h2>
+              
+              {/* Date Filter */}
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div>
+                  <label style={{ color: '#666', fontSize: '14px', marginRight: '0.5rem' }}>From:</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ color: '#666', fontSize: '14px', marginRight: '0.5rem' }}>To:</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                <button
+                  onClick={fetchTicketHistory}
+                  style={{
+                    backgroundColor: '#4A868C',
+                    color: 'white',
+                    padding: '8px 16px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Filter
+                </button>
+                {(startDate || endDate) && (
+                  <button
+                    onClick={() => {
+                      setStartDate('');
+                      setEndDate('');
+                      fetchTicketHistory();
+                    }}
+                    style={{
+                      backgroundColor: '#6b7280',
+                      color: 'white',
+                      padding: '8px 16px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '14px'
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {ticketHistory.length === 0 ? (
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                padding: '3rem',
+                textAlign: 'center',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              }}>
+                <Clock size={48} color="#ccc" style={{ marginBottom: '1rem' }} />
+                <p style={{ color: '#666', fontSize: '18px' }}>No completed tickets</p>
+                <p style={{ color: '#999' }}>Your completed and cancelled tickets will appear here</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {ticketHistory.map(ticket => (
+                  <div
+                    key={ticket._id}
+                    style={{
+                      backgroundColor: 'white',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                      borderLeft: `4px solid ${getStatusColor(ticket.status)}`
+                    }}
+                  >
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: '1rem'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ color: '#4A868C', marginBottom: '0.5rem' }}>
+                          Ticket #{ticket.ticket_number}
+                        </h3>
+                        <p style={{ color: '#666', margin: 0 }}>
+                          Service: {ticket.service_id?.service_name || 'N/A'}
+                        </p>
+                        <p style={{ color: '#666', margin: 0 }}>
+                          Office: {ticket.service_id?.office_id?.office_name || 'N/A'}
+                        </p>
+                      </div>
+                      <div style={{
+                        backgroundColor: getStatusColor(ticket.status),
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}>
+                        {ticket.status}
+                      </div>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      gap: '2rem',
+                      color: '#666',
+                      fontSize: '14px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Clock size={16} color="#666" />
+                        <span>
+                          Created: {(() => {
+                            const date = ticket.createdAt || ticket.created_at || ticket.timestamp;
+                            return date ? new Date(date).toLocaleDateString() : 'N/A';
+                          })()
+                          }
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <MapPin size={16} color="#666" />
+                        <span>{ticket.service_id?.office_id?.location || 'N/A'}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

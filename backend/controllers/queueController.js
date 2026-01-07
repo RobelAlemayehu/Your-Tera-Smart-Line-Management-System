@@ -112,3 +112,25 @@ exports.getMyTickets = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+// 7. Get My Completed Tickets with Date Filter
+exports.getMyCompletedTickets = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { startDate, endDate } = req.query;
+        
+        console.log('Getting completed tickets for user:', userId);
+        const tickets = await queueService.getMyCompletedTickets(userId, startDate, endDate);
+        console.log('Found completed tickets:', tickets.length);
+        
+        if (!tickets || tickets.length === 0) {
+            return res.status(200).json({ message: "No completed tickets found.", tickets: [] });
+        }
+
+        // Return tickets directly like getMyStatus does
+        res.json(tickets);
+    } catch (error) {
+        console.error('Error in getMyCompletedTickets:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
