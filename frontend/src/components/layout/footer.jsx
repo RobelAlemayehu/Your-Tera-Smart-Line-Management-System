@@ -44,7 +44,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2025 YourTera. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} YourTera. All rights reserved.</p>
         <div className="footer-legal">
           <Link to="/privacy">Privacy Policy</Link>
           <Link to="/terms">Terms of Service</Link>
