@@ -20,5 +20,6 @@ router.patch('/tickets/:ticket_id/status', verifyToken, roleMiddleware('Admin'),
 
 router.delete('/tickets/:service_id', verifyToken, roleMiddleware('Admin'), adminController.deleteServiceTickets);
 router.delete('/services/:serviceId/tickets/:ticketId', verifyToken, roleMiddleware('Admin'), adminController.adminDeleteTicket);
+router.delete('/services/:service_id', verifyToken, roleMiddleware('Admin'), adminController.deleteService);
 
 module.exports = router;

@@ -28,7 +28,9 @@ const SignIn = () => {
     setError('');
 
     try {
+      console.log('Attempting login with:', formData.email);
       const response = await authAPI.login(formData);
+      console.log('Login response:', response.data);
       const { token, user } = response.data;
       
       login(user, token);
@@ -40,6 +42,8 @@ const SignIn = () => {
         navigate('/customer/dashboard');
       }
     } catch (error) {
+      console.error('Login error:', error);
+      console.error('Error response:', error.response?.data);
       setError(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);

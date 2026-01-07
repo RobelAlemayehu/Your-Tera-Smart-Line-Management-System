@@ -22,7 +22,7 @@ router.post('/add',
     officeController.addOffice
 );
 
-router.put('/:id',
+router.patch('/:id',
     verifyToken,
     roleMiddleware('Admin'),
     officeController.updateOffice

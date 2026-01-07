@@ -81,6 +81,15 @@ class AdminService {
         return await service.save();
     }
 
+    async deleteService(service_id) {
+        if (!mongoose.Types.ObjectId.isValid(service_id)) {
+            throw new Error('Invalid service ID format');
+        }
+        const service = await Service.findByIdAndDelete(service_id);
+        if (!service) throw new Error('Service not found');
+        return service;
+    }
+
     async resetQueueForDay(service_id) {
         const serviceObjectId = mongoose.Types.ObjectId.isValid(service_id) 
             ? (typeof service_id === 'string' ? new mongoose.Types.ObjectId(service_id) : service_id)
@@ -114,6 +123,19 @@ class AdminService {
             service_id,
             { is_active },
             { new: true }
+        );
+        if (!service) throw new Error('Service not found');
+        return service;
+    }
+
+    async updateService(service_id, updateData) {
+        if (!mongoose.Types.ObjectId.isValid(service_id)) {
+            throw new Error('Invalid service ID format');
+        }
+        const service = await Service.findByIdAndUpdate(
+            service_id,
+            updateData,
+            { new: true, runValidators: true }
         );
         if (!service) throw new Error('Service not found');
         return service;

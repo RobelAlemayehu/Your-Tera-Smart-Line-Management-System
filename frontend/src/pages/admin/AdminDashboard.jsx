@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { adminAPI, officeAPI, serviceAPI } from '../../services/api';
-import { Users, Clock, CheckCircle, XCircle, Plus, Settings, BarChart3 } from 'lucide-react';
+import { Users, Clock, CheckCircle, XCircle, Plus, Settings, BarChart3, Edit, Trash2 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -15,6 +15,16 @@ const AdminDashboard = () => {
   const [message, setMessage] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  
+  // Edit/Delete modals
+  const [showEditOfficeModal, setShowEditOfficeModal] = useState(false);
+  const [showDeleteOfficeModal, setShowDeleteOfficeModal] = useState(false);
+  const [showEditServiceModal, setShowEditServiceModal] = useState(false);
+  const [showDeleteServiceModal, setShowDeleteServiceModal] = useState(false);
+  const [selectedOffice, setSelectedOffice] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
+  const [editOfficeData, setEditOfficeData] = useState({ office_name: '', location: '' });
+  const [editServiceData, setEditServiceData] = useState({ office_id: '', service_name: '', avg_wait_time: '', required_documents: [''] });
 
   // New office form
   const [newOffice, setNewOffice] = useState({
@@ -180,6 +190,98 @@ const AdminDashboard = () => {
       fetchUsers();
     } catch (error) {
       setMessage(error.response?.data?.error || 'Failed to update user role');
+    }
+  };
+
+  // Office edit/delete handlers
+  const handleEditOffice = (office) => {
+    setSelectedOffice(office);
+    setEditOfficeData({ office_name: office.office_name, location: office.location });
+    setShowEditOfficeModal(true);
+  };
+
+  const handleDeleteOffice = (office) => {
+    setSelectedOffice(office);
+    setShowDeleteOfficeModal(true);
+  };
+
+  const confirmEditOffice = async () => {
+    setLoading(true);
+    try {
+      await adminAPI.updateOffice(selectedOffice._id, editOfficeData);
+      setMessage('Office updated successfully');
+      setShowEditOfficeModal(false);
+      fetchOffices();
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Failed to update office');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDeleteOffice = async () => {
+    console.log('Attempting to delete office:', selectedOffice);
+    setLoading(true);
+    try {
+      const response = await adminAPI.deleteOffice(selectedOffice._id);
+      console.log('Delete office response:', response);
+      setMessage('Office deleted successfully');
+      setShowDeleteOfficeModal(false);
+      fetchOffices();
+      fetchServices(); // Refresh services as they might be affected
+    } catch (error) {
+      console.error('Delete office error:', error);
+      setMessage(error.response?.data?.error || 'Failed to delete office');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Service edit/delete handlers
+  const handleEditService = (service) => {
+    setSelectedService(service);
+    setEditServiceData({
+      office_id: service.office_id?._id || '',
+      service_name: service.service_name,
+      avg_wait_time: service.avg_wait_time,
+      required_documents: Array.isArray(service.required_documents) ? service.required_documents : [service.required_documents || '']
+    });
+    setShowEditServiceModal(true);
+  };
+
+  const handleDeleteService = (service) => {
+    setSelectedService(service);
+    setShowDeleteServiceModal(true);
+  };
+
+  const confirmEditService = async () => {
+    setLoading(true);
+    try {
+      await adminAPI.updateService(selectedService._id, editServiceData);
+      setMessage('Service updated successfully');
+      setShowEditServiceModal(false);
+      fetchServices();
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Failed to update service');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDeleteService = async () => {
+    console.log('Attempting to delete service:', selectedService);
+    setLoading(true);
+    try {
+      const response = await adminAPI.deleteService(selectedService._id);
+      console.log('Delete service response:', response);
+      setMessage('Service deleted successfully');
+      setShowDeleteServiceModal(false);
+      fetchServices();
+    } catch (error) {
+      console.error('Delete service error:', error);
+      setMessage(error.response?.data?.error || 'Failed to delete service');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -759,46 +861,163 @@ const AdminDashboard = () => {
               </form>
             </div>
 
-            {/* Services List */}
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              {services.map(service => (
-                <div
-                  key={service._id}
-                  style={{
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    padding: '1.5rem',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h3 style={{ color: '#4A868C', marginBottom: '0.5rem' }}>
-                        {service.service_name}
-                      </h3>
-                      <p style={{ color: '#666', margin: 0 }}>
-                        Office: {service.office_id?.office_name || 'N/A'}
-                      </p>
-                      <p style={{ color: '#666', margin: 0 }}>
-                        Average Wait Time: {service.avg_wait_time} minutes
-                      </p>
-                      <p style={{ color: '#666', margin: 0 }}>
-                        Required Documents: {Array.isArray(service.required_documents) ? service.required_documents.join(', ') : service.required_documents || 'N/A'}
-                      </p>
-                    </div>
-                    <div style={{
-                      backgroundColor: service.is_active ? '#10b981' : '#ef4444',
-                      color: 'white',
-                      padding: '4px 12px',
-                      borderRadius: '20px',
-                      fontSize: '14px',
-                      fontWeight: '500'
-                    }}>
-                      {service.is_active ? 'Active' : 'Inactive'}
+            {/* Offices List */}
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '2rem',
+              marginBottom: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h3 style={{ color: '#4A868C', marginBottom: '1rem' }}>Offices</h3>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {offices.map(office => (
+                  <div
+                    key={office._id}
+                    style={{
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '8px',
+                      padding: '1rem',
+                      border: '1px solid #e1e5e9'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <h4 style={{ color: '#4A868C', marginBottom: '0.25rem', margin: 0 }}>
+                          {office.office_name}
+                        </h4>
+                        <p style={{ color: '#666', margin: 0, fontSize: '14px' }}>
+                          Location: {office.location}
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={() => handleEditOffice(office)}
+                          style={{
+                            backgroundColor: '#4A868C',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Edit Office"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOffice(office)}
+                          style={{
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Delete Office"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Services List */}
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h3 style={{ color: '#4A868C', marginBottom: '1rem' }}>Services</h3>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {services.map(service => (
+                  <div
+                    key={service._id}
+                    style={{
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '8px',
+                      padding: '1rem',
+                      border: '1px solid #e1e5e9'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                          <h4 style={{ color: '#4A868C', margin: 0 }}>
+                            {service.service_name}
+                          </h4>
+                          <div style={{
+                            backgroundColor: service.is_active ? '#10b981' : '#ef4444',
+                            color: 'white',
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                            fontWeight: '500'
+                          }}>
+                            {service.is_active ? 'Active' : 'Inactive'}
+                          </div>
+                        </div>
+                        <p style={{ color: '#666', margin: 0, fontSize: '14px' }}>
+                          Office: {service.office_id?.office_name || 'N/A'}
+                        </p>
+                        <p style={{ color: '#666', margin: 0, fontSize: '14px' }}>
+                          Average Wait Time: {service.avg_wait_time} minutes
+                        </p>
+                        <p style={{ color: '#666', margin: 0, fontSize: '14px' }}>
+                          Required Documents: {Array.isArray(service.required_documents) ? service.required_documents.join(', ') : service.required_documents || 'N/A'}
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={() => handleEditService(service)}
+                          style={{
+                            backgroundColor: '#4A868C',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Edit Service"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteService(service)}
+                          style={{
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Delete Service"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -844,6 +1063,370 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Office Modal */}
+      {showEditOfficeModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+          }}>
+            <h3 style={{ color: '#4A868C', marginBottom: '1rem' }}>Edit Office</h3>
+            <div style={{ marginBottom: '1rem' }}>
+              <input
+                type="text"
+                placeholder="Office Name"
+                value={editOfficeData.office_name}
+                onChange={(e) => setEditOfficeData({ ...editOfficeData, office_name: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '2px solid #e1e5e9',
+                  borderRadius: '6px',
+                  fontSize: '16px',
+                  marginBottom: '1rem'
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Location"
+                value={editOfficeData.location}
+                onChange={(e) => setEditOfficeData({ ...editOfficeData, location: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '2px solid #e1e5e9',
+                  borderRadius: '6px',
+                  fontSize: '16px'
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowEditOfficeModal(false)}
+                style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmEditOffice}
+                disabled={loading}
+                style={{
+                  backgroundColor: loading ? '#ccc' : '#4A868C',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {loading ? 'Updating...' : 'Update Office'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Office Modal */}
+      {showDeleteOfficeModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+          }}>
+            <h3 style={{ color: '#ef4444', marginBottom: '1rem' }}>Delete Office</h3>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              Are you sure you want to delete "{selectedOffice?.office_name}"? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowDeleteOfficeModal(false)}
+                style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteOffice}
+                disabled={loading}
+                style={{
+                  backgroundColor: loading ? '#ccc' : '#ef4444',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {loading ? 'Deleting...' : 'Delete Office'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Service Modal */}
+      {showEditServiceModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '600px',
+            width: '90%',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }}>
+            <h3 style={{ color: '#4A868C', marginBottom: '1rem' }}>Edit Service</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <select
+                value={editServiceData.office_id}
+                onChange={(e) => setEditServiceData({ ...editServiceData, office_id: e.target.value })}
+                style={{
+                  padding: '12px',
+                  border: '2px solid #e1e5e9',
+                  borderRadius: '6px',
+                  fontSize: '16px'
+                }}
+              >
+                <option value="">Select Office</option>
+                {offices.map(office => (
+                  <option key={office._id} value={office._id}>
+                    {office.office_name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Service Name"
+                value={editServiceData.service_name}
+                onChange={(e) => setEditServiceData({ ...editServiceData, service_name: e.target.value })}
+                style={{
+                  padding: '12px',
+                  border: '2px solid #e1e5e9',
+                  borderRadius: '6px',
+                  fontSize: '16px'
+                }}
+              />
+              <input
+                type="number"
+                placeholder="Avg Wait Time (min)"
+                value={editServiceData.avg_wait_time}
+                onChange={(e) => setEditServiceData({ ...editServiceData, avg_wait_time: e.target.value })}
+                style={{
+                  padding: '12px',
+                  border: '2px solid #e1e5e9',
+                  borderRadius: '6px',
+                  fontSize: '16px'
+                }}
+              />
+              <div>
+                <label style={{ color: '#4A868C', fontWeight: '500', marginBottom: '0.5rem', display: 'block' }}>Required Documents</label>
+                {editServiceData.required_documents.map((doc, index) => (
+                  <div key={index} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <input
+                      type="text"
+                      placeholder={`Document ${index + 1}`}
+                      value={doc}
+                      onChange={(e) => {
+                        const updatedDocs = [...editServiceData.required_documents];
+                        updatedDocs[index] = e.target.value;
+                        setEditServiceData({ ...editServiceData, required_documents: updatedDocs });
+                      }}
+                      style={{
+                        padding: '12px',
+                        border: '2px solid #e1e5e9',
+                        borderRadius: '6px',
+                        fontSize: '16px',
+                        flex: 1
+                      }}
+                    />
+                    {editServiceData.required_documents.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedDocs = editServiceData.required_documents.filter((_, i) => i !== index);
+                          setEditServiceData({ ...editServiceData, required_documents: updatedDocs });
+                        }}
+                        style={{
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '8px 12px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditServiceData({ ...editServiceData, required_documents: [...editServiceData.required_documents, ''] });
+                  }}
+                  style={{
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    marginTop: '0.5rem'
+                  }}
+                >
+                  Add Document
+                </button>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+              <button
+                onClick={() => setShowEditServiceModal(false)}
+                style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmEditService}
+                disabled={loading}
+                style={{
+                  backgroundColor: loading ? '#ccc' : '#4A868C',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {loading ? 'Updating...' : 'Update Service'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Service Modal */}
+      {showDeleteServiceModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+          }}>
+            <h3 style={{ color: '#ef4444', marginBottom: '1rem' }}>Delete Service</h3>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              Are you sure you want to delete "{selectedService?.service_name}"? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowDeleteServiceModal(false)}
+                style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteService}
+                disabled={loading}
+                style={{
+                  backgroundColor: loading ? '#ccc' : '#ef4444',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {loading ? 'Deleting...' : 'Delete Service'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
