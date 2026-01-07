@@ -81,4 +81,10 @@ export const serviceAPI = {
   getServicesByOffice: (officeId) => api.get(`/services/office/${officeId}`),
 };
 
+export const profileAPI = {
+  getProfile: () => api.get('/profile'),
+  updateProfile: (data) => api.patch('/profile', data),
+  changePassword: (data) => api.patch('/profile/password', data),
+};
+
 export default api;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { queueAPI, officeAPI, serviceAPI } from '../../services/api';
-import { Bell, Clock, Users, MapPin } from 'lucide-react';
+import { queueAPI, officeAPI, serviceAPI, profileAPI } from '../../services/api';
+import { Bell, Clock, Users, MapPin, User, Eye, EyeOff } from 'lucide-react';
 import QRCode from 'qrcode';
 
 const CustomerDashboard = () => {
@@ -20,9 +20,17 @@ const CustomerDashboard = () => {
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [newTicket, setNewTicket] = useState(null);
 
+  // Profile management
+  const [profileData, setProfileData] = useState({ fullname: '', email: '', phone_number: '' });
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
     fetchOffices();
     fetchMyStatus();
+    fetchProfile();
   }, []);
 
   useEffect(() => {
@@ -83,6 +91,19 @@ const CustomerDashboard = () => {
     }
   };
 
+  const fetchProfile = async () => {
+    try {
+      const response = await profileAPI.getProfile();
+      setProfileData({
+        fullname: response.data.fullname,
+        email: response.data.email,
+        phone_number: response.data.phone_number
+      });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
   const handleJoinQueue = async (e) => {
     e.preventDefault();
     if (!selectedService) {
@@ -126,6 +147,34 @@ const CustomerDashboard = () => {
       case 'Completed': return '#6b7280';
       case 'Cancelled': return '#ef4444';
       default: return '#6b7280';
+    }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await profileAPI.updateProfile(profileData);
+      setMessage('Profile updated successfully');
+      fetchProfile();
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await profileAPI.changePassword(passwordData);
+      setMessage('Password changed successfully');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Failed to change password');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -225,6 +274,20 @@ const CustomerDashboard = () => {
             }}
           >
             Ticket History
+          </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            style={{
+              padding: '12px 24px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              color: activeTab === 'profile' ? '#4A868C' : '#666',
+              borderBottom: activeTab === 'profile' ? '2px solid #4A868C' : 'none',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Profile
           </button>
         </div>
 
@@ -596,6 +659,224 @@ const CustomerDashboard = () => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
+          <div>
+            <h2 style={{ color: '#4A868C', marginBottom: '1.5rem' }}>Profile Settings</h2>
+            
+            {/* Update Profile */}
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '2rem',
+              marginBottom: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h3 style={{ color: '#4A868C', marginBottom: '1rem' }}>Personal Information</h3>
+              <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4A868C', fontWeight: '500' }}>Full Name</label>
+                    <input
+                      type="text"
+                      value={profileData.fullname}
+                      onChange={(e) => setProfileData({ ...profileData, fullname: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '2px solid #e1e5e9',
+                        borderRadius: '6px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4A868C', fontWeight: '500' }}>Email</label>
+                    <input
+                      type="email"
+                      value={profileData.email}
+                      onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '2px solid #e1e5e9',
+                        borderRadius: '6px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4A868C', fontWeight: '500' }}>Phone Number</label>
+                    <input
+                      type="tel"
+                      value={profileData.phone_number}
+                      onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '2px solid #e1e5e9',
+                        borderRadius: '6px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    backgroundColor: loading ? '#ccc' : '#4A868C',
+                    color: 'white',
+                    padding: '12px 24px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    alignSelf: 'flex-start'
+                  }}
+                >
+                  {loading ? 'Updating...' : 'Update Profile'}
+                </button>
+              </form>
+            </div>
+
+            {/* Change Password */}
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '2rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h3 style={{ color: '#4A868C', marginBottom: '1rem' }}>Change Password</h3>
+              <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4A868C', fontWeight: '500' }}>Current Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          paddingRight: '45px',
+                          border: '2px solid #e1e5e9',
+                          borderRadius: '6px',
+                          fontSize: '16px'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#666'
+                        }}
+                      >
+                        {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4A868C', fontWeight: '500' }}>New Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          paddingRight: '45px',
+                          border: '2px solid #e1e5e9',
+                          borderRadius: '6px',
+                          fontSize: '16px'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#666'
+                        }}
+                      >
+                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4A868C', fontWeight: '500' }}>Confirm New Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          paddingRight: '45px',
+                          border: '2px solid #e1e5e9',
+                          borderRadius: '6px',
+                          fontSize: '16px'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#666'
+                        }}
+                      >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    backgroundColor: loading ? '#ccc' : '#4A868C',
+                    color: 'white',
+                    padding: '12px 24px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    alignSelf: 'flex-start'
+                  }}
+                >
+                  {loading ? 'Changing...' : 'Change Password'}
+                </button>
+              </form>
+            </div>
           </div>
         )}
 
