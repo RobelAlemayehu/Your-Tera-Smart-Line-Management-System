@@ -1,0 +1,33 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "develop",
+    "frontend/about-page",
+    "frontend/auth-page",
+    "frontend/services-page",
+    "frontend/status-page",
+    "main",
+    "origin",
+    "test"
+  ],
+  "parent": {
+    "develop": "main",
+    "frontend/about-page": "main",
+    "frontend/auth-page": "main",
+    "frontend/services-page": "main",
+    "frontend/status-page": "main",
+    "main": null,
+    "origin": "main",
+    "test": "main"
+  },
+  "order": [
+    "main",
+    "develop",
+    "frontend/about-page",
+    "frontend/auth-page",
+    "frontend/services-page",
+    "frontend/status-page",
+    "origin",
+    "test"
+  ]
+}
