@@ -35,6 +35,15 @@ const Hero = () => {
             Get Started
           </button>
         )}
+        {isAuthenticated && (
+          <button 
+            className="hero-btn" 
+            onClick={() => navigate('/services')}
+            style={{ backgroundColor: '#ff6b35' }}
+          >
+            Join Queue
+          </button>
+        )}
       </div>
 
       <div className="hero-image">

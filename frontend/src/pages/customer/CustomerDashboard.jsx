@@ -184,7 +184,12 @@ const CustomerDashboard = () => {
       <header style={{
         backgroundColor: 'white',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        padding: '1rem 0'
+        padding: '1rem 0',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000
       }}>
         <div style={{
           maxWidth: '1200px',
@@ -225,13 +230,24 @@ const CustomerDashboard = () => {
         </div>
       </header>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem', paddingTop: '180px' }}>
         {/* Navigation Tabs */}
         <div style={{
           display: 'flex',
           gap: '1rem',
           marginBottom: '2rem',
-          borderBottom: '2px solid #e5e7eb'
+          borderBottom: '2px solid #e5e7eb',
+          overflowX: 'auto',
+          position: 'fixed',
+          top: '90px',
+          left: 0,
+          right: 0,
+          backgroundColor: 'white',
+          zIndex: 999,
+          padding: '1rem 1.5rem',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          maxWidth: '1200px',
+          margin: '0 auto'
         }}>
           <button
             onClick={() => setActiveTab('join')}
@@ -245,7 +261,8 @@ const CustomerDashboard = () => {
               fontWeight: '600',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              whiteSpace: 'nowrap'
             }}
           >
             <Plus size={16} />
@@ -263,7 +280,8 @@ const CustomerDashboard = () => {
               fontWeight: '600',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              whiteSpace: 'nowrap'
             }}
           >
             <Clock size={16} />
@@ -281,7 +299,8 @@ const CustomerDashboard = () => {
               fontWeight: '600',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              whiteSpace: 'nowrap'
             }}
           >
             <History size={16} />
@@ -299,7 +318,8 @@ const CustomerDashboard = () => {
               fontWeight: '600',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              whiteSpace: 'nowrap'
             }}
           >
             <User size={16} />
