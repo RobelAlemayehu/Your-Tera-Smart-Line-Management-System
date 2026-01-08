@@ -19,12 +19,24 @@ const sessionService = require('./services/sessionService');
 const app = express();
 
 // Middleware
-app.use(cors()); 
+app.use(cors({
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'https://your-vercel-app-url.vercel.app'
+    ],
+    credentials: true
+})); 
 app.use(express.json()); 
 
 // Basic Health Check Route
 app.get('/', (req, res) => {
     res.send('Smart Line Management System API is Running...');
+});
+
+// Health check endpoint for deployment
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', message: 'Server is healthy' });
 });
 
 // Routes
