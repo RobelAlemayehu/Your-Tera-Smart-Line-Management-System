@@ -11,8 +11,8 @@ const Footer = () => {
             <span className="footer-brand-text">YourTera</span>
           </div>
           <p className="footer-description">
-            Digitizing physical queues to reduce waiting time and improve service efficiency for offices, hospitals, and
-            service centers.
+            Advanced queue management platform that enables remote queue joining, real-time notifications, 
+            and digital ticket systems to transform service delivery across multiple industries.
           </p>
           <div className="working-hours">
             <p className="hours-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
