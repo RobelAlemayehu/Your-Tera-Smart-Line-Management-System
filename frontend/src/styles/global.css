@@ -178,6 +178,7 @@ main {
   transition: background-color 0.3s;
   font-size: 1rem;
   font-weight: 500;
+  display: block;
 }
 
 .login-btn:hover {
@@ -1572,6 +1573,14 @@ main {
 
 @media (max-width: 768px) {
   .navbar-links {
+    display: none;
+  }
+  
+  .desktop-login-btn {
+    display: none;
+  }
+  
+  .profile-btn {
     display: none;
   }
   

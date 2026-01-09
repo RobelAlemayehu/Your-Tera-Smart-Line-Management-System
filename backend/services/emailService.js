@@ -50,6 +50,8 @@ exports.sendVerificationCode = async (email, code) => {
 
         console.log('📧 Sending email to:', email);
         console.log('📤 From email:', mailOptions.from);
+        console.log('🔧 SENDGRID_API_KEY:', process.env.SENDGRID_API_KEY ? 'Set' : 'Not set');
+        console.log('🔧 EMAIL_USER:', process.env.EMAIL_USER ? 'Set' : 'Not set');
         
         const result = await transporter.sendMail(mailOptions);
         console.log('✅ Email sent successfully:', result.messageId);
