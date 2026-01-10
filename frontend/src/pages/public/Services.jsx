@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/navbar';
 import Footer from '../../components/layout/footer';
-import { queueAPI } from '../../services/api';
+import { queueAPI, officeAPI, serviceAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { MapPin, Clock, Users } from 'lucide-react';
 import QRCode from 'qrcode';
-import axios from 'axios';
 
 const Services = () => {
   const [offices, setOffices] = useState([]);
@@ -28,15 +27,10 @@ const Services = () => {
   const fetchData = async () => {
     try {
       console.log('Fetching offices and services...');
-      // Create axios instance without interceptors for public routes
-      const publicAPI = axios.create({
-        baseURL: 'http://localhost:5000/api',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
+      // Use the configured API instead of hardcoded localhost
       const [officesRes, servicesRes] = await Promise.all([
-        publicAPI.get('/offices'),
-        publicAPI.get('/services')
+        officeAPI.getOffices(),
+        serviceAPI.getServices()
       ]);
       console.log('Offices response:', officesRes.data);
       console.log('Services response:', servicesRes.data);
