@@ -58,11 +58,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Handle React routing - this should be AFTER all API routes
-if (process.env.NODE_ENV === 'production') {
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-    });
-}
+// Note: Catch-all route removed to avoid path-to-regexp issues
+// Frontend routing should be handled by the deployment platform
 
 setInterval(() => {
     sessionService.clearExpiredSessions();
