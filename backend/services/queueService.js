@@ -57,16 +57,22 @@ class QueueService {
         });
         await ticket.save();
 
-        // Notify User via Email
-        console.log(`Sending email notification to user ${userId} at ${user.email}`);
-        await notificationService.notifyUser(
-            userId.toString(),
-            user.email,
-            `Your ticket ${ticketNumber} has been created. ${peopleAhead} people ahead of you. Estimated wait time: ${estimatedWaitTime} minutes.`,
-            'Email',
-            'Queue Ticket Created - Your Tera'
-        );
-        console.log('Email notification sent successfully');
+        // Send email notification asynchronously (don't wait for it)
+        setImmediate(async () => {
+            try {
+                console.log(`Sending email notification to user ${userId} at ${user.email}`);
+                await notificationService.notifyUser(
+                    userId.toString(),
+                    user.email,
+                    `Your ticket ${ticketNumber} has been created. ${peopleAhead} people ahead of you. Estimated wait time: ${estimatedWaitTime} minutes.`,
+                    'Email',
+                    'Queue Ticket Created - Your Tera'
+                );
+                console.log('Email notification sent successfully');
+            } catch (error) {
+                console.error('Email notification failed:', error.message);
+            }
+        });
 
         return ticket;
     }
@@ -141,13 +147,21 @@ class QueueService {
         ticket.status = 'Cancelled';
         await ticket.save();
 
-        await notificationService.notifyUser(
-            userId.toString(),
-            ticket.user_id.email,
-            `Your ticket ${ticket.ticket_number} has been cancelled successfully. You can join the queue again anytime.`,
-            'Email',
-            'Ticket Cancelled - Your Tera'
-        );
+        // Send cancellation email asynchronously
+        setImmediate(async () => {
+            try {
+                await notificationService.notifyUser(
+                    userId.toString(),
+                    ticket.user_id.email,
+                    `Your ticket ${ticket.ticket_number} has been cancelled successfully. You can join the queue again anytime.`,
+                    'Email',
+                    'Ticket Cancelled - Your Tera'
+                );
+            } catch (error) {
+                console.error('Cancellation email failed:', error.message);
+            }
+        });
+        
         return { message: "Ticket cancelled successfully." };
     }
 
