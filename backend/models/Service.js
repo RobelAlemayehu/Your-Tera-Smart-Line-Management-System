@@ -22,6 +22,10 @@ const serviceSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         required: true
+    },
+    required_documents: {
+        type: [String],
+        default: []
     }
 }, {
     timestamps: false,

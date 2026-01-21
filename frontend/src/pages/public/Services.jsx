@@ -4,7 +4,7 @@ import Navbar from '../../components/layout/navbar';
 import Footer from '../../components/layout/footer';
 import { queueAPI, officeAPI, serviceAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { MapPin, Clock, Users } from 'lucide-react';
+import { MapPin, Clock, Users, Loader2 } from 'lucide-react';
 import QRCode from 'qrcode';
 
 const Services = () => {
@@ -46,7 +46,7 @@ const Services = () => {
 
   const handleJoinQueue = async (service) => {
     console.log('handleJoinQueue called with:', { service, user });
-    
+
     if (!user) {
       console.log('No user found, redirecting to signup');
       navigate('/signup');
@@ -76,12 +76,12 @@ const Services = () => {
         phone_number: user.phone_number,
         user: user
       });
-      
+
       const response = await queueAPI.joinQueue({
         service_id: selectedServiceForJoin._id,
         phone_number: user.phone_number
       });
-      
+
       console.log('Join queue response:', response.data);
       setMessage('Successfully joined the queue!');
       setNewTicket(response.data.data);
@@ -90,7 +90,7 @@ const Services = () => {
     } catch (error) {
       console.error('Join queue error:', error);
       console.error('Error response:', error.response?.data);
-      
+
       let errorMessage = 'Failed to join queue';
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
@@ -99,7 +99,7 @@ const Services = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       setMessage(errorMessage);
     } finally {
       setJoinLoading(null);
@@ -110,13 +110,16 @@ const Services = () => {
     return (
       <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
         <Navbar />
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '50vh' 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh'
         }}>
-          <p style={{ color: '#4A868C', fontSize: '18px' }}>Loading services...</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <Loader2 className="animate-spin" size={48} color="#4A868C" />
+            <p style={{ color: '#4A868C', fontSize: '18px', fontWeight: '500' }}>Loading...</p>
+          </div>
         </div>
         <Footer />
       </div>
@@ -126,19 +129,19 @@ const Services = () => {
   return (
     <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
       <Navbar />
-      
+
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1.5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h1 style={{ 
-            color: '#4A868C', 
-            fontSize: '3rem', 
+          <h1 style={{
+            color: '#4A868C',
+            fontSize: '3rem',
             fontWeight: 'bold',
             marginBottom: '1rem'
           }}>
             Our Services
           </h1>
-          <p style={{ 
-            color: '#666', 
+          <p style={{
+            color: '#666',
             fontSize: '1.25rem',
             maxWidth: '800px',
             margin: '0 auto'
@@ -184,9 +187,9 @@ const Services = () => {
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
                 border: '1px solid #e5e7eb'
               }}>
-                <h2 style={{ 
-                  color: '#4A868C', 
-                  fontSize: '1.8rem', 
+                <h2 style={{
+                  color: '#4A868C',
+                  fontSize: '1.8rem',
                   fontWeight: 'bold',
                   marginBottom: '1.5rem'
                 }}>
@@ -204,10 +207,10 @@ const Services = () => {
               </div>
             ) : (
               offices.map(office => {
-                const officeServices = services.filter(service => 
+                const officeServices = services.filter(service =>
                   service.office_id?._id === office._id || service.office_id === office._id
                 );
-                
+
                 return (
                   <div
                     key={office._id}
@@ -220,17 +223,17 @@ const Services = () => {
                     }}
                   >
                     <div style={{ marginBottom: '1.5rem' }}>
-                      <h2 style={{ 
-                        color: '#4A868C', 
-                        fontSize: '1.8rem', 
+                      <h2 style={{
+                        color: '#4A868C',
+                        fontSize: '1.8rem',
                         fontWeight: 'bold',
                         marginBottom: '0.5rem'
                       }}>
                         {office.office_name}
                       </h2>
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: '0.5rem',
                         color: '#666'
                       }}>
@@ -299,7 +302,7 @@ const Services = () => {
 
       {/* Required Documents Modal */}
       {showDocumentsModal && selectedServiceForJoin && (
-        <DocumentsModal 
+        <DocumentsModal
           service={selectedServiceForJoin}
           onConfirm={confirmJoinQueue}
           onClose={() => {
@@ -311,7 +314,7 @@ const Services = () => {
 
       {/* QR Ticket Modal */}
       {showTicketModal && newTicket && (
-        <TicketModal 
+        <TicketModal
           ticket={newTicket}
           onClose={() => {
             setShowTicketModal(false);
@@ -326,7 +329,7 @@ const Services = () => {
 // Service Card Component
 const ServiceCard = ({ service, handleJoinQueue, joinLoading, user }) => {
   const isLoading = joinLoading === service._id; // Check if this specific service is loading
-  
+
   return (
     <div
       style={{
@@ -336,17 +339,17 @@ const ServiceCard = ({ service, handleJoinQueue, joinLoading, user }) => {
         border: '1px solid #e5e7eb'
       }}
     >
-      <h3 style={{ 
-        color: '#4A868C', 
+      <h3 style={{
+        color: '#4A868C',
         fontSize: '1.2rem',
         marginBottom: '1rem'
       }}>
         {service.service_name}
       </h3>
-      
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
         gap: '1rem',
         marginBottom: '1rem',
         color: '#666'
@@ -367,19 +370,7 @@ const ServiceCard = ({ service, handleJoinQueue, joinLoading, user }) => {
         </div>
       </div>
 
-      {service.required_documents && (
-        <div style={{ marginBottom: '1rem' }}>
-          <h4 style={{ color: '#4A868C', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Required Documents:</h4>
-          <ul style={{ margin: 0, paddingLeft: '1rem', color: '#666', fontSize: '0.85rem' }}>
-            {Array.isArray(service.required_documents) 
-              ? service.required_documents.map((doc, index) => (
-                  <li key={index} style={{ marginBottom: '0.25rem' }}>{doc}</li>
-                ))
-              : <li>{service.required_documents}</li>
-            }
-          </ul>
-        </div>
-      )}
+
 
       <button
         onClick={() => handleJoinQueue(service)}
@@ -395,9 +386,9 @@ const ServiceCard = ({ service, handleJoinQueue, joinLoading, user }) => {
           width: '100%'
         }}
       >
-        {!service.is_active ? 'Service Unavailable' : 
-         isLoading ? 'Joining...' : 
-         user ? 'Join Queue' : 'Sign Up to Join'}
+        {!service.is_active ? 'Service Unavailable' :
+          isLoading ? 'Joining...' :
+            user ? 'Join Queue' : 'Sign Up to Join'}
       </button>
     </div>
   );
@@ -405,11 +396,11 @@ const ServiceCard = ({ service, handleJoinQueue, joinLoading, user }) => {
 
 // Required Documents Modal Component
 const DocumentsModal = ({ service, onConfirm, onClose }) => {
-  const requiredDocs = Array.isArray(service.required_documents) 
-    ? service.required_documents.filter(doc => doc && doc.trim() !== '') 
-    : (service.required_documents && service.required_documents.trim() !== '' 
-       ? [service.required_documents] 
-       : ['No specific documents required']);
+  const requiredDocs = Array.isArray(service.required_documents)
+    ? service.required_documents.filter(doc => doc && doc.trim() !== '')
+    : (service.required_documents && service.required_documents.trim() !== ''
+      ? [service.required_documents]
+      : ['No specific documents required']);
 
   return (
     <div style={{
@@ -435,7 +426,7 @@ const DocumentsModal = ({ service, onConfirm, onClose }) => {
         <h2 style={{ color: '#4A868C', marginBottom: '1rem', textAlign: 'center' }}>
           Required Documents
         </h2>
-        
+
         <div style={{
           backgroundColor: '#f8f9fa',
           borderRadius: '8px',
@@ -446,11 +437,11 @@ const DocumentsModal = ({ service, onConfirm, onClose }) => {
           <h3 style={{ color: '#4A868C', marginBottom: '1rem', fontSize: '18px' }}>
             {service.service_name}
           </h3>
-          
+
           <p style={{ color: '#666', marginBottom: '1rem', fontSize: '14px' }}>
             Please ensure you have the following documents before joining the queue:
           </p>
-          
+
           <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#333' }}>
             {requiredDocs.map((doc, index) => (
               <li key={index} style={{ marginBottom: '0.5rem', fontSize: '15px' }}>
@@ -460,9 +451,9 @@ const DocumentsModal = ({ service, onConfirm, onClose }) => {
           </ol>
         </div>
 
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
           justifyContent: 'center',
           alignItems: 'center'
         }}>
@@ -580,7 +571,7 @@ const TicketModal = ({ ticket, onClose }) => {
         boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
       }}>
         <h2 style={{ color: '#4A868C', marginBottom: '1rem' }}>Your Queue Ticket</h2>
-        
+
         <div style={{
           border: '2px solid #4A868C',
           borderRadius: '8px',
@@ -590,15 +581,15 @@ const TicketModal = ({ ticket, onClose }) => {
           <h3 style={{ color: '#4A868C', fontSize: '24px', marginBottom: '1rem' }}>
             {ticket.ticket_number}
           </h3>
-          
+
           {qrCodeUrl && (
-            <img 
-              src={qrCodeUrl} 
+            <img
+              src={qrCodeUrl}
               alt={`QR Code for ticket ${ticket.ticket_number}`}
               style={{ marginBottom: '1rem' }}
             />
           )}
-          
+
           <div style={{ color: '#666', marginBottom: '0.5rem' }}>
             Position: {ticket.position}
           </div>

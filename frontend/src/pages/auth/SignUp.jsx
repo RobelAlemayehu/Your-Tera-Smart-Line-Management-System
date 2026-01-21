@@ -16,7 +16,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -35,6 +35,13 @@ const SignUp = () => {
 
     if (formData.password !== formData.confirm_password) {
       setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    const phoneRegex = /^(\+2519\d{8}|09\d{8})$/;
+    if (!phoneRegex.test(formData.phone_number)) {
+      setError('Invalid phone number format. Use +2519... or 09...');
       setLoading(false);
       return;
     }
@@ -70,9 +77,9 @@ const SignUp = () => {
         boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ 
-            color: '#4A868C', 
-            fontSize: '28px', 
+          <h1 style={{
+            color: '#4A868C',
+            fontSize: '28px',
             fontWeight: 'bold',
             marginBottom: '8px'
           }}>
@@ -111,9 +118,9 @@ const SignUp = () => {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
               color: '#4A868C',
               fontWeight: '500'
             }}>
@@ -140,9 +147,9 @@ const SignUp = () => {
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
               color: '#4A868C',
               fontWeight: '500'
             }}>
@@ -169,9 +176,9 @@ const SignUp = () => {
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
               color: '#4A868C',
               fontWeight: '500'
             }}>
@@ -198,9 +205,9 @@ const SignUp = () => {
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
               color: '#4A868C',
               fontWeight: '500'
             }}>
@@ -249,9 +256,9 @@ const SignUp = () => {
           </div>
 
           <div style={{ marginBottom: '25px' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
               color: '#4A868C',
               fontWeight: '500'
             }}>
@@ -319,18 +326,18 @@ const SignUp = () => {
           </button>
         </form>
 
-        <div style={{ 
-          textAlign: 'center', 
+        <div style={{
+          textAlign: 'center',
           marginTop: '25px',
           paddingTop: '20px',
           borderTop: '1px solid #e1e5e9'
         }}>
           <p style={{ color: '#666', fontSize: '14px' }}>
             Already have an account?{' '}
-            <Link 
-              to="/signin" 
-              style={{ 
-                color: '#4A868C', 
+            <Link
+              to="/signin"
+              style={{
+                color: '#4A868C',
                 textDecoration: 'none',
                 fontWeight: '600'
               }}

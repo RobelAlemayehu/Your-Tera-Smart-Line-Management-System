@@ -19,6 +19,8 @@ const CustomerDashboard = () => {
   const [message, setMessage] = useState('');
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [newTicket, setNewTicket] = useState(null);
+  const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+  const [selectedServiceForJoin, setSelectedServiceForJoin] = useState(null);
 
   // Profile management
   const [profileData, setProfileData] = useState({ fullname: '', email: '', phone_number: '' });
@@ -32,16 +34,16 @@ const CustomerDashboard = () => {
     fetchOffices();
     fetchMyStatus();
     fetchProfile();
-    
+
     // Close mobile menu on window resize
     const handleResize = () => {
       if (window.innerWidth > 768) {
         setIsMobileMenuOpen(false);
       }
     };
-    
+
     window.addEventListener('resize', handleResize);
-    
+
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -118,13 +120,26 @@ const CustomerDashboard = () => {
     }
   };
 
-  const handleJoinQueue = async (e) => {
+  const handleJoinQueue = (e) => {
     e.preventDefault();
     if (!selectedService) {
       setMessage('Please select a service');
       return;
     }
 
+    // Find the full service object to get required documents
+    const serviceToJoin = services.find(s => s._id === selectedService);
+    if (!serviceToJoin) {
+      setMessage('Service not found');
+      return;
+    }
+
+    setSelectedServiceForJoin(serviceToJoin);
+    setShowDocumentsModal(true);
+  };
+
+  const confirmJoinQueue = async () => {
+    setShowDocumentsModal(false);
     setLoading(true);
     try {
       const response = await queueAPI.joinQueue({
@@ -137,6 +152,7 @@ const CustomerDashboard = () => {
       fetchMyStatus();
       setSelectedOffice('');
       setSelectedService('');
+      setSelectedServiceForJoin(null);
     } catch (error) {
       setMessage(error.response?.data?.error || 'Failed to join queue');
     } finally {
@@ -214,11 +230,11 @@ const CustomerDashboard = () => {
           alignItems: 'center'
         }}>
           <div>
-            <h1 
+            <h1
               onClick={() => window.location.href = '/'}
-              style={{ 
-                color: '#4A868C', 
-                fontSize: '24px', 
+              style={{
+                color: '#4A868C',
+                fontSize: '24px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 margin: 0
@@ -411,7 +427,7 @@ const CustomerDashboard = () => {
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
           }}>
             <h2 style={{ color: '#4A868C', marginBottom: '1.5rem' }}>Join a Queue</h2>
-            
+
             <form onSubmit={handleJoinQueue}>
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{
@@ -499,7 +515,7 @@ const CustomerDashboard = () => {
         {activeTab === 'status' && (
           <div>
             <h2 style={{ color: '#4A868C', marginBottom: '1.5rem' }}>My Tickets</h2>
-            
+
             {myTickets.length === 0 ? (
               <div style={{
                 backgroundColor: 'white',
@@ -611,7 +627,7 @@ const CustomerDashboard = () => {
               marginBottom: '1.5rem'
             }}>
               <h2 style={{ color: '#4A868C', margin: 0 }}>Ticket History</h2>
-              
+
               {/* Date Filter */}
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <div>
@@ -678,7 +694,7 @@ const CustomerDashboard = () => {
                 )}
               </div>
             </div>
-            
+
             {ticketHistory.length === 0 ? (
               <div style={{
                 backgroundColor: 'white',
@@ -765,7 +781,7 @@ const CustomerDashboard = () => {
         {activeTab === 'profile' && (
           <div>
             <h2 style={{ color: '#4A868C', marginBottom: '1.5rem' }}>Profile Settings</h2>
-            
+
             {/* Update Profile */}
             <div style={{
               backgroundColor: 'white',
@@ -981,9 +997,21 @@ const CustomerDashboard = () => {
 
         {/* QR Ticket Modal */}
         {showTicketModal && newTicket && (
-          <TicketModal 
+          <TicketModal
             ticket={newTicket}
             onClose={() => setShowTicketModal(false)}
+          />
+        )}
+
+        {/* Required Documents Modal */}
+        {showDocumentsModal && selectedServiceForJoin && (
+          <DocumentsModal
+            service={selectedServiceForJoin}
+            onConfirm={confirmJoinQueue}
+            onClose={() => {
+              setShowDocumentsModal(false);
+              setSelectedServiceForJoin(null);
+            }}
           />
         )}
       </div>
@@ -1015,8 +1043,8 @@ const QRCodeDisplay = ({ ticketNumber }) => {
   }, [ticketNumber]);
 
   return qrCodeUrl ? (
-    <img 
-      src={qrCodeUrl} 
+    <img
+      src={qrCodeUrl}
       alt={`QR Code for ticket ${ticketNumber}`}
       style={{ width: '60px', height: '60px' }}
     />
@@ -1101,7 +1129,7 @@ const TicketModal = ({ ticket, onClose }) => {
         boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
       }}>
         <h2 style={{ color: '#4A868C', marginBottom: '1rem' }}>Your Queue Ticket</h2>
-        
+
         <div style={{
           border: '2px solid #4A868C',
           borderRadius: '8px',
@@ -1111,15 +1139,15 @@ const TicketModal = ({ ticket, onClose }) => {
           <h3 style={{ color: '#4A868C', fontSize: '24px', marginBottom: '1rem' }}>
             {ticket.ticket_number}
           </h3>
-          
+
           {qrCodeUrl && (
-            <img 
-              src={qrCodeUrl} 
+            <img
+              src={qrCodeUrl}
               alt={`QR Code for ticket ${ticket.ticket_number}`}
               style={{ marginBottom: '1rem' }}
             />
           )}
-          
+
           <div style={{ color: '#666', marginBottom: '0.5rem' }}>
             Position: {ticket.position}
           </div>
@@ -1159,6 +1187,105 @@ const TicketModal = ({ ticket, onClose }) => {
             }}
           >
             Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Required Documents Modal Component
+const DocumentsModal = ({ service, onConfirm, onClose }) => {
+  const requiredDocs = Array.isArray(service.required_documents)
+    ? service.required_documents.filter(doc => doc && doc.trim() !== '')
+    : (service.required_documents && service.required_documents.trim() !== ''
+      ? [service.required_documents]
+      : ['No specific documents required']);
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '2rem',
+        maxWidth: '500px',
+        width: '90%',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+      }}>
+        <h2 style={{ color: '#4A868C', marginBottom: '1rem', textAlign: 'center' }}>
+          Required Documents
+        </h2>
+
+        <div style={{
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          border: '1px solid #e5e7eb'
+        }}>
+          <h3 style={{ color: '#4A868C', marginBottom: '1rem', fontSize: '18px' }}>
+            {service.service_name}
+          </h3>
+
+          <p style={{ color: '#666', marginBottom: '1rem', fontSize: '14px' }}>
+            Please ensure you have the following documents before joining the queue:
+          </p>
+
+          <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#333' }}>
+            {requiredDocs.map((doc, index) => (
+              <li key={index} style={{ marginBottom: '0.5rem', fontSize: '15px' }}>
+                {doc}
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: '#6b7280',
+              color: 'white',
+              padding: '12px 24px',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '16px'
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              backgroundColor: '#4A868C',
+              color: 'white',
+              padding: '12px 24px',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '16px'
+            }}
+          >
+            Confirm & Join Queue
           </button>
         </div>
       </div>

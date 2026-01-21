@@ -1,7 +1,8 @@
 import Navbar from '../../components/layout/navbar';
 import Footer from '../../components/layout/footer';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Clock, Users, MapPin, CheckCircle, Shield, Smartphone } from 'lucide-react';
 
 const About = () => {
@@ -11,6 +12,7 @@ const About = () => {
   const services = [
     {
       id: 1,
+      slug: "revenue-office",
       title: "Revenue Office Queue Management",
       description: "Streamline tax payments, license renewals, and government fee collections with our intelligent queue system.",
       image: "/images/revenue-office.png",
@@ -46,6 +48,7 @@ const About = () => {
     },
     {
       id: 2,
+      slug: "ethio-telecom",
       title: "Ethio Telecom Customer Service",
       description: "Optimize customer support operations with smart queue management for telecom services and technical support.",
       image: "/images/ethio-telecom.png",
@@ -82,6 +85,7 @@ const About = () => {
     },
     {
       id: 3,
+      slug: "kebele-office",
       title: "Kebele Office Services",
       description: "Digitize community office operations for ID cards, certificates, and local government services.",
       image: "/images/kebele.png",
@@ -119,27 +123,38 @@ const About = () => {
     }
   ];
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
   return (
     <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
       <Navbar />
-      
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '0 auto', 
+
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
         padding: window.innerWidth <= 768 ? '2rem 1rem' : '4rem 1.5rem'
       }}>
         {/* Header Section */}
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h1 style={{ 
-            color: '#4A868C', 
-            fontSize: window.innerWidth <= 768 ? '2.5rem' : '3rem', 
+          <h1 style={{
+            color: '#4A868C',
+            fontSize: window.innerWidth <= 768 ? '2.5rem' : '3rem',
             fontWeight: 'bold',
             marginBottom: '1rem'
           }}>
             About YourTera
           </h1>
-          <p style={{ 
-            color: '#666', 
+          <p style={{
+            color: '#666',
             fontSize: '1.25rem',
             maxWidth: '800px',
             margin: '0 auto'
@@ -166,7 +181,7 @@ const About = () => {
               Our Mission
             </h3>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
-              To eliminate long waiting lines and improve service efficiency across government offices, 
+              To eliminate long waiting lines and improve service efficiency across government offices,
               telecom centers, and public service institutions in Ethiopia.
             </p>
           </div>
@@ -182,7 +197,7 @@ const About = () => {
               Our Vision
             </h3>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
-              A future where every Ethiopian can access public services efficiently, 
+              A future where every Ethiopian can access public services efficiently,
               transparently, and without unnecessary delays through digital innovation.
             </p>
           </div>
@@ -198,7 +213,7 @@ const About = () => {
               Our Impact
             </h3>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
-              Serving offices across Ethiopia, reducing wait times significantly, 
+              Serving offices across Ethiopia, reducing wait times significantly,
               and improving customer satisfaction for thousands of users daily.
             </p>
           </div>
@@ -206,16 +221,16 @@ const About = () => {
 
         {/* Services Documentation Section */}
         <div style={{ marginBottom: '6rem' }}>
-          <h2 style={{ 
-            color: '#4A868C', 
-            fontSize: '2.5rem', 
+          <h2 style={{
+            color: '#4A868C',
+            fontSize: '2.5rem',
             fontWeight: 'bold',
             textAlign: 'center',
             marginBottom: '3rem'
           }}>
             Our Services & Documentation
           </h2>
-          
+
           {services.map((service, index) => (
             <ServiceDocumentation key={service.id} service={service} index={index} />
           ))}
@@ -228,31 +243,31 @@ const About = () => {
           borderRadius: '12px',
           marginBottom: '4rem'
         }}>
-          <h2 style={{ 
-            color: '#4A868C', 
-            fontSize: '2rem', 
+          <h2 style={{
+            color: '#4A868C',
+            fontSize: '2rem',
             textAlign: 'center',
             marginBottom: '2rem'
           }}>
             Technology & Features
           </h2>
-          
+
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '2rem'
           }}>
-            <TechFeature 
+            <TechFeature
               icon={<Smartphone size={24} />}
               title="Mobile-First Design"
               description="Responsive web platform accessible on any device"
             />
-            <TechFeature 
+            <TechFeature
               icon={<Shield size={24} />}
               title="Secure & Reliable"
               description="Enterprise-grade security with high uptime guarantee"
             />
-            <TechFeature 
+            <TechFeature
               icon={<Clock size={24} />}
               title="Real-Time Updates"
               description="Live queue status and instant SMS notifications"
@@ -275,7 +290,7 @@ const About = () => {
               Join hundreds of organizations already using YourTera to improve their customer experience.
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button 
+              <button
                 onClick={() => navigate('/signup')}
                 style={{
                   backgroundColor: 'white',
@@ -290,7 +305,7 @@ const About = () => {
               >
                 Get Started Today
               </button>
-              <button 
+              <button
                 onClick={() => navigate('/services')}
                 style={{
                   backgroundColor: 'transparent',
@@ -318,15 +333,17 @@ const About = () => {
 // Service Documentation Component
 const ServiceDocumentation = ({ service, index }) => {
   const isEven = index % 2 === 0;
-  
+
   return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '16px',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-      marginBottom: '4rem',
-      overflow: 'hidden'
-    }}>
+    <div
+      id={service.slug}
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        marginBottom: '4rem',
+        overflow: 'hidden'
+      }}>
       <div style={{
         display: 'grid',
         gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : (isEven ? '1fr 1fr' : '1fr 1fr'),
@@ -342,7 +359,7 @@ const ServiceDocumentation = ({ service, index }) => {
           backgroundColor: service.id === 2 ? '#f8f9fa' : 'transparent',
           minHeight: '400px'
         }} />
-        
+
         {/* Content Section */}
         <div style={{
           order: window.innerWidth <= 768 ? 2 : (isEven ? 2 : 1),
@@ -359,7 +376,7 @@ const ServiceDocumentation = ({ service, index }) => {
           }}>
             {service.title}
           </h3>
-          
+
           <p style={{
             color: '#666',
             fontSize: '1.1rem',
@@ -368,7 +385,7 @@ const ServiceDocumentation = ({ service, index }) => {
           }}>
             {service.description}
           </p>
-          
+
           <div style={{ marginBottom: '2rem' }}>
             <h4 style={{ color: '#4A868C', marginBottom: '1rem' }}>Key Features:</h4>
             <div style={{ display: 'grid', gap: '0.5rem' }}>
@@ -382,7 +399,7 @@ const ServiceDocumentation = ({ service, index }) => {
           </div>
         </div>
       </div>
-      
+
       {/* Detailed Documentation */}
       <div style={{
         backgroundColor: '#f8f9fa',
@@ -398,7 +415,7 @@ const ServiceDocumentation = ({ service, index }) => {
             <h4 style={{ color: '#4A868C', fontSize: '1.2rem', marginBottom: '1rem' }}>Overview</h4>
             <p style={{ color: '#666', lineHeight: '1.6' }}>{service.documentation.overview}</p>
           </div>
-          
+
           {/* How It Works */}
           <div>
             <h4 style={{ color: '#4A868C', fontSize: '1.2rem', marginBottom: '1rem' }}>How It Works</h4>
@@ -408,7 +425,7 @@ const ServiceDocumentation = ({ service, index }) => {
               ))}
             </ol>
           </div>
-          
+
           {/* Benefits */}
           <div>
             <h4 style={{ color: '#4A868C', fontSize: '1.2rem', marginBottom: '1rem' }}>Benefits</h4>
@@ -418,16 +435,8 @@ const ServiceDocumentation = ({ service, index }) => {
               ))}
             </ul>
           </div>
-          
-          {/* Requirements */}
-          <div>
-            <h4 style={{ color: '#4A868C', fontSize: '1.2rem', marginBottom: '1rem' }}>Required Documents</h4>
-            <ul style={{ color: '#666', paddingLeft: '1.2rem' }}>
-              {service.documentation.requirements.map((req, idx) => (
-                <li key={idx} style={{ marginBottom: '0.5rem', lineHeight: '1.5' }}>{req}</li>
-              ))}
-            </ul>
-          </div>
+
+
         </div>
       </div>
     </div>
