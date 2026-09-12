@@ -9,9 +9,9 @@ import Services from "../pages/public/Services";
 import ServiceDetail from "../pages/public/ServiceDetail";
 
 // Auth
-import  SignUp  from '../pages/auth/SignUp';
-import  SignIn  from '../pages/auth/SignIn';
-import ForgetPassword from '../pages/auth/ForgotPassword';
+import SignUp from "../pages/auth/SignUp";
+import SignIn from "../pages/auth/SignIn";
+import ForgetPassword from "../pages/auth/ForgotPassword";
 import Verify from "../pages/auth/Verify";
 import ResetPassword from "../pages/auth/ResetPassword";
 import Success from "../pages/auth/Success";
@@ -46,31 +46,33 @@ const AppRoutes = () => {
       <Route path="/success" element={<Success />} />
 
       {/* Admin Routes */}
-      <Route 
-        path="/admin/dashboard" 
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route
+        path="/admin/dashboard"
         element={
           <ProtectedRoute requiredRole="Admin">
             <AdminDashboard />
           </ProtectedRoute>
-        } 
+        }
       />
 
       {/* Customer Routes */}
-      <Route 
-        path="/customer/dashboard" 
+      <Route path="/customer" element={<Navigate to="/customer/dashboard" replace />} />
+      <Route
+        path="/customer/dashboard"
         element={
           <ProtectedRoute requiredRole="Customer">
             <CustomerDashboard />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/customer/my-ticket" 
+      <Route
+        path="/customer/my-ticket"
         element={
           <ProtectedRoute requiredRole="Customer">
             <MyTicket />
           </ProtectedRoute>
-        } 
+        }
       />
 
       {/* Legacy User Routes - keeping for backward compatibility */}
